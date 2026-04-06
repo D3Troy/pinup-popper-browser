@@ -3,8 +3,19 @@ var express = require("express");
 function createRouter(settings) {
   var router = express.Router();
 
-  /* GET home page. */
+  /* Root: redirect based on defaultView setting. */
   router.get("/", function (req, res) {
+    switch (settings.options && settings.options.defaultView) {
+      case "playlists":
+        return res.redirect("/playlists");
+      case "home":
+      default:
+        return res.redirect("/home");
+    }
+  });
+
+  /* GET home page. */
+  router.get("/home", function (req, res) {
     let categories, themes, types, decades, manufacturers, emulators;
     if (settings.options.filters.category) {
       categories = filterAndSort(

@@ -1,0 +1,45 @@
+extends layout
+
+block content
+  nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark
+    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    div.d-flex.align-items-center.ml-auto.order-md-last
+      a(href=homeUrl, title="Home")
+        img(src="/images/home.png", alt="Home", width="35", height="35")
+    div.collapse.navbar-collapse(id='navbarNav')
+      ul.navbar-nav.nav.mr-auto
+        li.nav-item
+          a.nav-link(href='/home') Home
+        li.nav-item
+          a.nav-link(href='/playlists') Playlists
+
+  div.container-fluid
+    div.row.justify-content-center.mt-5
+      div.col-12.col-sm-8.col-md-5.col-lg-4
+        div.card.bg-dark.text-white
+          div.card-body.text-center
+            h5.card-title.mb-3 #{display}
+            p.text-muted This playlist is protected. Enter the PIN to continue.
+
+            if error
+              div.alert.alert-danger(role='alert') #{error}
+
+            form#lockForm(method='POST', action='/playlists/' + playlistId + '/unlock')
+              div.form-group
+                input#pinInput.form-control.text-center(
+                  type='password',
+                  name='pin',
+                  placeholder='Enter PIN',
+                  autocomplete='off',
+                  autofocus,
+                  maxlength='4',
+                  pattern='[0-9]{4}',
+                  inputmode='numeric'
+                )
+              button.btn.btn-primary.btn-block(type='submit') Unlock
+            a.btn.btn-secondary.btn-block.mt-2(href='/playlists') Cancel
+            script.
+              document.getElementById('pinInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); document.getElementById('lockForm').submit(); }
+              });

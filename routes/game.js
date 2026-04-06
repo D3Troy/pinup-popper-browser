@@ -125,11 +125,14 @@ function createRouter(settings) {
   function renderGame(req, res, gameId) {
     let game = getGame(gameId, req);
     if (game) {
+      const playlistId = req.query.playlist || null;
+
       res.render("game", {
         game: game,
         info: settings.options.game.info,
         help: settings.options.game.help,
         playfield: settings.options.game.playfield,
+        playlistId: playlistId,
         wheelRotation: settings.media.useThumbs
           ? req.app.locals.globalSettings.thumbRotation
           : 0,

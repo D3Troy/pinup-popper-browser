@@ -1,15 +1,16 @@
 pupServer:
   url: http://localhost
   db:
-    path: C:\PinUpSystem\PUPDatabase.db
+    path: C:\vPinball\PinUPSystem\PUPDatabase.db
     filter: ifnull(GameTheme, 1) <> 'Adult'
 
 httpServer:
-  port: 3000
+  port: 8080
   logFormat: dev
   logLevel: error
 
 options:
+  defaultView: playlists  # home | playlists
   filters:
     category: true
     theme: true
