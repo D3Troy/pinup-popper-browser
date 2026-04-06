@@ -1,11 +1,72 @@
 "use strict";
 var express = require("express");
+var crypto = require("crypto");
 
+function timeSlot(cacheMinutes) {
+    return Math.floor(Date.now() / (cacheMinutes * 60 * 1000));
+}
+
+function computeToken(id, passCode, slot) {
+    return crypto.createHash("sha256").update(id + ":" + passCode + ":" + slot).digest("hex");
+}
+
+function isValidToken(token, id, passCode, cacheMinutes) {
+    var slot = timeSlot(cacheMinutes);
+    // Accept current slot and the previous one to handle boundary edge cases
+    return token === computeToken(id, passCode, slot) ||
+           token === computeToken(id, passCode, slot - 1);
+}
+
+function getCookie(req, name) {
+    var header = req.headers.cookie || "";
+    var found = null;
+    header.split(";").forEach(function (part) {
+        var idx = part.indexOf("=");
+        if (idx < 0) return;
+        var key = part.slice(0, idx).trim();
+        if (key === name) {
+            found = decodeURIComponent(part.slice(idx + 1).trim());
+        }
+    });
+    return found;
+}
 function createRouter(settings) {
     var router = express.Router();
     var homeUrl = (settings.options && settings.options.defaultView === "playlists")
         ? "/playlists"
         : "/home";
+    var cacheMinutes = (settings.media && settings.media.cacheInMinutes) || 20;
+
+    // Passcode unlock
+    router.post("/:id/unlock", function (req, res) {
+        var id = parseInt(req.params.id, 10);
+        if (isNaN(id)) return res.redirect("/playlists");
+
+        var parentRows = req.app.locals.queryRows(
+            "SELECT * FROM Playlists WHERE PlayListID = " + id
+        );
+        if (!parentRows.length) return res.redirect("/playlists");
+
+        var parent = mapPlaylist(parentRows[0]);
+        var pin = (req.body.pin || "").toString().trim();
+
+        if (pin === parent.passCode) {
+            var token = computeToken(id, parent.passCode, timeSlot(cacheMinutes));
+            res.cookie("pl_" + id, token, {
+                maxAge: cacheMinutes * 60 * 1000,
+                httpOnly: true,
+                sameSite: "lax",
+            });
+            return res.redirect("/playlists/" + id);
+        }
+
+        return res.render("playlist_lock", {
+            playlistId: id,
+            display: parent.display,
+            homeUrl: homeUrl,
+            error: "Incorrect PIN. Please try again.",
+        });
+    });
 
     // Top-level playlists
     router.get("/", function (req, res) {
@@ -31,6 +92,19 @@ function createRouter(settings) {
         if (!parentRows.length) return res.redirect("/playlists");
 
         var parent = mapPlaylist(parentRows[0]);
+
+        // Passcode check
+        if (parent.passCode) {
+            var cookieToken = getCookie(req, "pl_" + id);
+            if (!isValidToken(cookieToken, id, parent.passCode, cacheMinutes)) {
+                return res.render("playlist_lock", {
+                    playlistId: id,
+                    display: parent.display,
+                    homeUrl: homeUrl,
+                    error: null,
+                });
+            }
+        }
         var rotation = getWheelRotation(req, settings);
         var useThumbs = !!(settings.media && settings.media.useThumbs);
         var children = getPlaylists(req, id);
@@ -47,7 +121,7 @@ function createRouter(settings) {
             });
         }
 
-        // Leaf node — run the playlist SQL to get games
+        // Leaf node — run the playlist SQL to get games, or fall back to PlayListDetails
         var games = [];
         var error = null;
 
@@ -55,6 +129,20 @@ function createRouter(settings) {
             try {
                 var rows = req.app.locals.queryRows(parent.gameSQL);
                 games = rows
+                    .map(function (row) {
+                        var idx = req.app.locals.gameIds.get(parseInt(row.GameID, 10));
+                        return idx !== undefined ? req.app.locals.games[idx] : null;
+                    })
+                    .filter(Boolean);
+            } catch (err) {
+                error = "Could not load games: " + err.message;
+            }
+        } else {
+            try {
+                var detailRows = req.app.locals.queryRows(
+                    "SELECT GameID FROM PlayListDetails WHERE PlayListID = " + id
+                );
+                games = detailRows
                     .map(function (row) {
                         var idx = req.app.locals.gameIds.get(parseInt(row.GameID, 10));
                         return idx !== undefined ? req.app.locals.games[idx] : null;
@@ -129,6 +217,7 @@ function createRouter(settings) {
             display: row.PlayDisplay || row.PlayName || "",
             parent: row.PlayListParent,
             gameSQL: row.PlayListSQL || "",
+            passCode: (row.passcode && row.passcode.toString()) || "",
         };
     }
 
