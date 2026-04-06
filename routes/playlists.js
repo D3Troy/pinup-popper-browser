@@ -174,6 +174,7 @@ function createRouter(settings) {
             placeholder: "/images/wheel_loading_0.gif",
             cssClass: "",
             favorite: false,
+            goBack: true,
         };
     }
 

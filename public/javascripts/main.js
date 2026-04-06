@@ -135,6 +135,11 @@ $(document).ready(function () {
     }
   });
 
+  $(document).on("click", "a[data-go-back='true']", function (e) {
+    e.preventDefault();
+    history.back();
+  });
+
   $("#btnLaunch").on("click", function () {
     var spinner = $(
       '<span class="spinner-border spinner-border-sm ml-1" role="status" aria-hidden="true"></span>'
