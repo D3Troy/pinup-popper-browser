@@ -3,6 +3,9 @@ var express = require("express");
 
 function createRouter(settings) {
     var router = express.Router();
+    var homeUrl = (settings.options && settings.options.defaultView === "playlists")
+        ? "/playlists"
+        : "/home";
 
     // Top-level playlists
     router.get("/", function (req, res) {
@@ -13,6 +16,7 @@ function createRouter(settings) {
         });
         res.render("playlists", {
             items: items,
+            homeUrl: homeUrl,
         });
     });
 
@@ -39,6 +43,7 @@ function createRouter(settings) {
             }));
             return res.render("playlists", {
                 items: items,
+                homeUrl: homeUrl,
             });
         }
 
@@ -66,6 +71,7 @@ function createRouter(settings) {
 
         res.render("playlists", {
             items: items,
+            homeUrl: homeUrl,
             error: error,
         });
     });
