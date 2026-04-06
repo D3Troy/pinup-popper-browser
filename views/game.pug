@@ -5,7 +5,7 @@ block content
     button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     div.ml-auto.order-md-last
-      a(href="/", title="Home")
+      a(href="/home", title="Home")
         img(src="/images/home.png", alt="Home", width="35", height="35")
     #navbarNav.collapse.navbar-collapse
       ul#tabs.navbar-nav.nav
@@ -54,7 +54,7 @@ block content
             div.row
               div.col
                 button#btnLaunch.btn.btn-primary(type='button', data-id=game.id) Launch Game
-                button#btnBack.btn.btn-secondary.ml-2(type='button') Go Back
+                button#btnBack.btn.btn-secondary.ml-2(type='button', data-back-url=playlistId ? '/playlists/' + playlistId : null) Go Back
             div.row.mt-2
               #response.col
             div.row.mt-2

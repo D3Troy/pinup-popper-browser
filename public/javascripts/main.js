@@ -127,7 +127,12 @@ $(document).ready(function () {
   });
 
   $("#btnBack").on("click", function () {
-    history.back();
+    var backUrl = $(this).data("back-url");
+    if (backUrl) {
+      window.location.href = backUrl;
+    } else {
+      history.back();
+    }
   });
 
   $("#btnLaunch").on("click", function () {

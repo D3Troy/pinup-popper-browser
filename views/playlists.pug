@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark
+    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    div.d-flex.align-items-center.ml-auto.order-md-last
+      a(href="/home", title="Home")
+        img(src="/images/home.png", alt="Home", width="35", height="35")
+    div.collapse.navbar-collapse(id='navbarNav')
+      ul.navbar-nav.nav.mr-auto
+        li.nav-item
+          a.nav-link(href='/home') Home
+        li.nav-item
+          a.nav-link.active(href='/playlists') Playlists
+
+  div.container-fluid
+
+    if error
+      div.alert.alert-danger(role='alert') #{error}
+
+    if !items.length && !error
+      div.alert.alert-info(role='alert') No items found.
+
+    div#playlistsRow.row.no-gutters
+      each item in items
+        div.col-6.col-md-4.col-lg-3.col-xl-2.game
+          a(href=item.link, title=item.display, data-toggle='tooltip')
+            img.wheel.img-fluid.lazyload(
+              class=item.cssClass,
+              src=item.placeholder,
+              data-src=item.src,
+              alt=item.display
+            )
+          if item.favorite
+            i.favorite(title='Favorite')

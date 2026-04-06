@@ -10,6 +10,7 @@ httpServer:
   logLevel: error
 
 options:
+  defaultView: playlists  # home | playlists
   filters:
     category: true
     theme: true

@@ -9,6 +9,7 @@ var loadSettings = require("./settings").loadSettings;
 var initSqlJs = require("sql.js");
 var createRouteIndex = require("./routes/index");
 var createRouteGame = require("./routes/game");
+var createRoutePlaylists = require("./routes/playlists");
 
 var app = express();
 
@@ -128,7 +129,7 @@ async function start() {
 
   let sql =
     "select g.GameID as gameId, g.EmuID as emuId, g.GameName as gameName, g.GameDisplay as gameDisplay, g.GameType as gameType, g.GameYear as gameYear, g.NumPlayers as numPlayers, g.Manufact as manufacturer, " +
-    "s.LastPlayed as lastPlayed, s.NumberPlays as numberPlays, s.TimePlayedSecs as timePlayedSecs, g.Category as category, g.GameTheme as gameTheme, f.isFav as isFav " +
+    "s.LastPlayed as lastPlayed, s.NumberPlays as numberPlays, s.TimePlayedSecs as timePlayedSecs, g.Category as category, g.GameTheme as gameTheme, f.isFav as isFav, g.GameRating as gameRating " +
     "from games g join emulators e on g.emuid = e.emuid " +
     "left join (SELECT GameID, 1 as isFav FROM Playlistdetails WHERE isFav > 0 GROUP BY GameID) f on g.gameid = f.gameid " +
     "left join gamesstats s on g.gameid = s.gameid " +
@@ -161,6 +162,7 @@ async function start() {
         ? parseInt(row.gameYear) - (parseInt(row.gameYear) % 10)
         : "",
       favorite: row.isFav,
+      rating: row.gameRating || 0,
     });
     gameIds.set(row.gameId, i);
     i++;
@@ -208,7 +210,18 @@ async function start() {
     );
   });
 
+  if (globalSettings.defaultMediaDir) {
+    app.use(
+      "/media/playlists",
+      express.static(
+        path.join(globalSettings.defaultMediaDir, "Wheel"),
+        cacheOptions
+      )
+    );
+  }
+
   app.use("/games", createRouteGame(settings));
+  app.use("/playlists", createRoutePlaylists(settings));
   app.use("/", createRouteIndex(settings));
 
   // catch 404 and forward to error handler
