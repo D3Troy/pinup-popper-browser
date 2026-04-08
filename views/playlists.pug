@@ -1,14 +1,14 @@
 extends layout
 
 block content
-  nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark
-    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+  nav.navbar.navbar-expand-lg.fixed-top.px-3.bg-body-tertiary(data-bs-theme="dark")
+    button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
-    div.d-flex.align-items-center.ml-auto.order-md-last
+    div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
       a(href=homeUrl, title="Home")
-        img(src="/images/home.png", alt="Home", width="35", height="35")
+        i.bi.bi-house-fill.fs-3
     div.collapse.navbar-collapse(id='navbarNav')
-      ul.navbar-nav.nav.mr-auto
+      ul.navbar-nav.nav.me-auto
         li.nav-item
           a.nav-link(href='/home') Home
         li.nav-item
@@ -22,10 +22,10 @@ block content
     if !items.length && !error
       div.alert.alert-info(role='alert') No items found.
 
-    div#playlistsRow.row.no-gutters
+    div#playlistsRow.row.g-0
       each item in items
         div.col-6.col-md-4.col-lg-3.col-xl-2.my-auto.game
-          a(href=item.link, title=item.display, data-toggle='tooltip', data-go-back=item.goBack ? 'true' : null)
+          a(href=item.link, title=item.display, data-bs-toggle='tooltip', data-go-back=item.goBack ? 'true' : null)
             img.wheel.img-fluid.lazyload(
               class=item.cssClass,
               src=item.placeholder,
@@ -33,4 +33,4 @@ block content
               alt=item.display
             )
           if item.favorite
-            i.favorite(title='Favorite')
+            i.bi.bi-star-fill.favorite(title='Favorite')

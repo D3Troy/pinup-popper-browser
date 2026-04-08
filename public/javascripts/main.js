@@ -1,250 +1,287 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
   lazyload();
 
-  $('[data-toggle="tooltip"]').tooltip();
+  var htmlEl = document.documentElement;
+  var toggleBtn = document.createElement("button");
+  toggleBtn.id = "darkModeToggle";
+  toggleBtn.type = "button";
+  toggleBtn.className = "btn btn-outline-light btn-sm";
+  toggleBtn.setAttribute("aria-label", "Toggle dark mode");
+  toggleBtn.innerHTML = htmlEl.getAttribute("data-bs-theme") === "dark" ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+  toggleBtn.addEventListener("click", function () {
+    var next = htmlEl.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+    htmlEl.setAttribute("data-bs-theme", next);
+    localStorage.setItem("theme", next);
+    this.innerHTML = next === "dark" ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+  });
+  var navbarRight = document.getElementById("navbarRight");
+  var navbarTarget = navbarRight || document.querySelector(".navbar");
+  if (navbarTarget) navbarTarget.appendChild(toggleBtn);
 
-  $("#tabs li:eq(0) a").tab("show");
-
-  $("img.wheel").on("error", function () {
-    $(this).removeClass(function (index, css) {
-      return (css.match(/(^|\s)rotate\S+/g) || []).join(" ");
-    });
-    $(this).attr("src", "/images/unavailable.png");
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    new bootstrap.Tooltip(el);
   });
 
-  if (
-    $(location)
-      .attr("href")
-      .substring($(location).attr("href").lastIndexOf("/") + 1) === "current"
-  ) {
-    let refresh = $("#game").data("refresh");
+  var firstTab = document.querySelector("#tabs li:first-child a");
+  if (firstTab) { bootstrap.Tab.getOrCreateInstance(firstTab).show(); }
+
+  document.querySelectorAll("img.wheel").forEach(function (img) {
+    img.addEventListener("error", function () {
+      this.className = this.className.replace(/(^|\s)rotate\S+/g, " ").trim();
+      this.src = "/images/unavailable.png";
+    });
+  });
+
+  var gameEl = document.getElementById("game");
+  if (gameEl && location.href.split("/").pop() === "current") {
+    var refresh = gameEl.dataset.refresh;
     if (refresh) {
-      window.setInterval("location.reload();", $("#game").data("refresh"));
+      window.setInterval(function () { location.reload(); }, refresh);
     }
   }
 
-  $('a[data-toggle="tab"]').on("show.bs.tab", function (e) {
-    let target;
-    if (e.target.text === "Info") {
-      target = "info";
-    } else if (e.target.text === "Help") {
-      target = "help";
-    } else if (e.target.text === "Playfield") {
-      target = "playfield";
-    }
-
-    if (target) {
-      if (target == "playfield") {
-        if ($("#playfield").children().length) {
-          return;
-        }
-
-        fetch($("#game").data("gameid") + "/" + target)
-          .then((response) => {
-            return response.status == 200 ? response.json() : [];
-          })
-          .then((data) => {
-            if (data.length) {
-              let rotate = $("#playfield").data("rotate") != undefined;
-              let src = data[0];
-              var elem;
-              if (src.endsWith(".png") || src.endsWith(".jpg")) {
-                elem = $("<img />", {
-                  class: rotate ? "playfieldRotate" : "playfield",
-                  src: src,
-                });
-              } else {
-                elem = $("<video />", {
-                  id: "vidPlayfield",
-                  class: rotate ? "playfieldRotate" : "playfield",
-                  src: data[0],
-                  type: "video/mp4",
-                  playsinline: true,
-                  autoplay: true,
-                  loop: true,
-                });
-              }
-            } else {
-              elem = $('<img src="/images/unavailable.png" />');
-            }
-            elem.appendTo($("#playfield"));
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        if (
-          $("#carousel" + e.target.text + " .carousel-inner").children().length
-        ) {
-          return;
-        }
-
-        fetch($("#game").data("gameid") + "/" + target)
-          .then((response) => {
-            return response.status == 200 ? response.json() : [];
-          })
-          .then((data) => {
-            if (!data.length) {
-              data.push("/images/unavailable.png");
-            }
-            let i = 0;
-            $.each(data, function (index, value) {
-              $(
-                '<div class="carousel-item"><img ' +
-                  (i == 0 ? "" : "data-") +
-                  'src="' +
-                  value +
-                  '"></div>'
-              ).appendTo("#carousel" + e.target.text + " .carousel-inner");
-              i++;
-            });
-            $("#carousel" + e.target.text).carousel("pause");
-            if (i == 1) {
-              $("#carousel" + e.target.text + " a").remove();
-            }
-            $("#carousel" + e.target.text + " .carousel-item")
-              .first()
-              .addClass("active");
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+  document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(function (tabEl) {
+    tabEl.addEventListener("show.bs.tab", function (e) {
+      let target;
+      if (e.target.textContent.trim() === "Info") {
+        target = "info";
+      } else if (e.target.textContent.trim() === "Help") {
+        target = "help";
+      } else if (e.target.textContent.trim() === "Playfield") {
+        target = "playfield";
       }
+
+      if (target) {
+        if (target == "playfield") {
+          var playfield = document.getElementById("playfield");
+          if (playfield.children.length) {
+            return;
+          }
+
+          fetch(gameEl.dataset.gameid + "/" + target)
+            .then((response) => {
+              return response.status == 200 ? response.json() : [];
+            })
+            .then((data) => {
+              var elem;
+              if (data.length) {
+                let rotate = "rotate" in playfield.dataset;
+                let src = data[0];
+                if (src.endsWith(".png") || src.endsWith(".jpg")) {
+                  elem = document.createElement("img");
+                  elem.className = rotate ? "playfieldRotate" : "playfield";
+                  elem.src = src;
+                } else {
+                  elem = document.createElement("video");
+                  elem.id = "vidPlayfield";
+                  elem.className = rotate ? "playfieldRotate" : "playfield";
+                  elem.src = data[0];
+                  elem.setAttribute("playsinline", "");
+                  elem.autoplay = true;
+                  elem.loop = true;
+                }
+              } else {
+                elem = document.createElement("img");
+                elem.src = "/images/unavailable.png";
+              }
+              playfield.appendChild(elem);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          var carouselInner = document.querySelector("#carousel" + e.target.textContent.trim() + " .carousel-inner");
+          if (carouselInner.children.length) {
+            return;
+          }
+
+          fetch(gameEl.dataset.gameid + "/" + target)
+            .then((response) => {
+              return response.status == 200 ? response.json() : [];
+            })
+            .then((data) => {
+              if (!data.length) {
+                data.push("/images/unavailable.png");
+              }
+              data.forEach(function (value, i) {
+                var div = document.createElement("div");
+                div.className = "carousel-item" + (i === 0 ? " active" : "");
+                var img = document.createElement("img");
+                if (i === 0) img.src = value;
+                else img.dataset.src = value;
+                div.appendChild(img);
+                carouselInner.appendChild(div);
+              });
+              var carouselEl = document.getElementById("carousel" + e.target.textContent.trim());
+              bootstrap.Carousel.getOrCreateInstance(carouselEl).pause();
+              if (data.length == 1) {
+                carouselEl.querySelectorAll("button[data-bs-slide]").forEach(function (btn) { btn.remove(); });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll(".carousel").forEach(function (carousel) {
+    carousel.addEventListener("slide.bs.carousel", function (e) {
+      var upcomingImage = e.relatedTarget.querySelector("img");
+      if (upcomingImage && !upcomingImage.getAttribute("src")) {
+        upcomingImage.src = upcomingImage.dataset.src;
+      }
+    });
+  });
+
+  document.addEventListener("click", function (e) {
+    var navbarCollapse = document.querySelector(".navbar-collapse.show");
+    if (navbarCollapse && e.target.matches('a:not([data-bs-toggle]), img')) {
+      bootstrap.Collapse.getOrCreateInstance(navbarCollapse).hide();
     }
   });
 
-  $(".carousel").on("slide.bs.carousel", function (e) {
-    var $upcomingImage = $(e.relatedTarget).find("img");
-    if (typeof $upcomingImage.attr("src") === "undefined") {
-      $upcomingImage.attr("src", $upcomingImage.data("src"));
-    }
-  });
+  var btnBack = document.getElementById("btnBack");
+  if (btnBack) {
+    btnBack.addEventListener("click", function () {
+      var backUrl = this.dataset.backUrl;
+      if (backUrl) {
+        window.location.href = backUrl;
+      } else {
+        history.back();
+      }
+    });
+  }
 
-  $(document).on("click", ".navbar-collapse.show", function (e) {
-    if ($(e.target).is('a:not(".dropdown-toggle"), img')) {
-      $(this).collapse("hide");
-    }
-  });
-
-  $("#btnBack").on("click", function () {
-    var backUrl = $(this).data("back-url");
-    if (backUrl) {
-      window.location.href = backUrl;
-    } else {
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest("a[data-go-back='true']");
+    if (link) {
+      e.preventDefault();
       history.back();
     }
   });
 
-  $(document).on("click", "a[data-go-back='true']", function (e) {
-    e.preventDefault();
-    history.back();
-  });
-
-  $("#btnLaunch").on("click", function () {
-    var spinner = $(
-      '<span class="spinner-border spinner-border-sm ml-1" role="status" aria-hidden="true"></span>'
-    );
-    $(this).append(spinner);
-    fetch("/games/" + $(this).data("id") + "/launch")
-      .then((response) => {
-        response.status != 200
-          ? showAlert(danger, "Launch request failed")
-          : showAlert("success", "Launch request succeeded");
-      })
-      .catch(() => {
-        showAlert("danger", "Launch request failed");
-      })
-      .finally(() => {
-        spinner.remove();
-      });
-  });
-
-  $("#btnExit").on("click", function () {
-    var spinner = $(
-      '<span class="spinner-border spinner-border-sm ml-1" role="status" aria-hidden="true"></span>'
-    );
-    $(this).append(spinner);
-    fetch("/games/exit")
-      .then((response) => {
-        response.status != 200
-          ? showAlert(danger, "Exit request failed")
-          : showAlert("success", "Exit request succeeded");
-      })
-      .catch(() => {
-        showAlert("danger", "Exit request failed");
-      })
-      .finally(() => {
-        spinner.remove();
-      });
-  });
-
-  function showAlert(type, text) {
-    $(
-      '<div class="alert alert-' +
-        type +
-        ' role="alert">' +
-        text +
-        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-        '<span aria-hidden="true">&times;</button></div>'
-    )
-      .hide()
-      .appendTo("#response")
-      .fadeIn(1000);
-
-    $(".alert")
-      .delay(3000)
-      .fadeOut("normal", function () {
-        $(this).remove();
-      });
+  var btnLaunch = document.getElementById("btnLaunch");
+  if (btnLaunch) {
+    btnLaunch.addEventListener("click", function () {
+      var spinner = document.createElement("span");
+      spinner.className = "spinner-border spinner-border-sm ms-1";
+      spinner.setAttribute("role", "status");
+      spinner.setAttribute("aria-hidden", "true");
+      this.appendChild(spinner);
+      fetch("/games/" + this.dataset.id + "/launch")
+        .then((response) => {
+          response.status != 200
+            ? showAlert("danger", "Launch request failed")
+            : showAlert("success", "Launch request succeeded");
+        })
+        .catch(() => {
+          showAlert("danger", "Launch request failed");
+        })
+        .finally(() => {
+          spinner.remove();
+        });
+    });
   }
 
-  $("[data-filter]").on("click", function () {
-    var type = $(this).data("filter");
-    var value = type === "fav" ? "1" : $(this).text();
-    filter(type, value);
+  var btnExit = document.getElementById("btnExit");
+  if (btnExit) {
+    btnExit.addEventListener("click", function () {
+      var spinner = document.createElement("span");
+      spinner.className = "spinner-border spinner-border-sm ms-1";
+      spinner.setAttribute("role", "status");
+      spinner.setAttribute("aria-hidden", "true");
+      this.appendChild(spinner);
+      fetch("/games/exit")
+        .then((response) => {
+          response.status != 200
+            ? showAlert("danger", "Exit request failed")
+            : showAlert("success", "Exit request succeeded");
+        })
+        .catch(() => {
+          showAlert("danger", "Exit request failed");
+        })
+        .finally(() => {
+          spinner.remove();
+        });
+    });
+  }
+
+  function showAlert(type, text) {
+    var div = document.createElement("div");
+    div.className = "alert alert-" + type;
+    div.setAttribute("role", "alert");
+    div.innerHTML = text + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    var response = document.getElementById("response");
+    if (response) {
+      response.appendChild(div);
+      setTimeout(function () {
+        div.style.transition = "opacity 0.5s";
+        div.style.opacity = "0";
+        setTimeout(function () { div.remove(); }, 500);
+      }, 3000);
+    }
+  }
+
+  document.querySelectorAll("[data-filter]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var type = this.dataset.filter;
+      var value = type === "fav" ? "1" : this.textContent.trim();
+      filter(type, value);
+    });
   });
 
   function filter(type, value) {
-    $("#gamesRow div").filter(function () {
-      $(this).toggle($(this).data(type) == value);
+    document.querySelectorAll("#gamesRow div.game").forEach(function (el) {
+      el.style.display = el.dataset[type] == value ? "" : "none";
     });
     updateGameCount();
     localStorage.setItem("filterType", type);
     localStorage.setItem("filterValue", value);
-    $("#gameSearch").val("");
+    document.getElementById("gameSearch").value = "";
   }
 
-  if ($("[data-filter]").length > 0 && localStorage.getItem("filterType")) {
+  if (document.querySelector("[data-filter]") && localStorage.getItem("filterType")) {
     var type = localStorage.getItem("filterType");
     var value = localStorage.getItem("filterValue");
     filter(type, value);
   }
 
-  $("#clearFilter").on("click", function () {
-    $("#gameSearch").val("");
-    search($("#gameSearch"));
-    $(this).toggle();
-  });
-
-  function checkFilter() {
-    var gameCount = $("#gameCount");
-    $("#clearFilter").toggle(gameCount.data("total") != gameCount.text());
+  var clearFilter = document.getElementById("clearFilter");
+  if (clearFilter) {
+    clearFilter.addEventListener("click", function () {
+      var gameSearch = document.getElementById("gameSearch");
+      gameSearch.value = "";
+      search(gameSearch);
+      checkFilter();
+    });
   }
 
-  var observer = new MutationObserver(function (e) {
+  function checkFilter() {
+    var gameCount = document.getElementById("gameCount");
+    var clearFilter = document.getElementById("clearFilter");
+    if (gameCount && clearFilter) {
+      clearFilter.style.display = gameCount.dataset.total != gameCount.textContent ? "" : "none";
+    }
+  }
+
+  var observer = new MutationObserver(function () {
     checkFilter();
   });
 
-  if ($("#gameCount").length > 0) {
-    observer.observe($("#gameCount")[0], {
+  var gameCountEl = document.getElementById("gameCount");
+  if (gameCountEl) {
+    observer.observe(gameCountEl, {
       characterData: true,
       childList: true,
     });
   }
 
   function updateGameCount() {
-    var cnt = $(".game:visible").length;
-    $("#gameCount").text(cnt);
+    var cnt = document.querySelectorAll(".game:not([style*='display: none'])").length;
+    var gameCount = document.getElementById("gameCount");
+    if (gameCount) gameCount.textContent = cnt;
   }
 
   function delay(callback, ms) {
@@ -259,45 +296,57 @@ $(document).ready(function () {
     };
   }
 
-  $("form input").keydown(function (e) {
-    if (e.keyCode == 13) {
-      e.preventDefault();
-      return false;
-    }
+  document.querySelectorAll("form input").forEach(function (input) {
+    input.addEventListener("keydown", function (e) {
+      if (e.keyCode == 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
   });
 
   function search(searchbox) {
-    var value = searchbox.val().toLowerCase();
-    $("#gamesRow div").filter(function () {
-      $(this).toggle(
-        $("a", this).attr("data-original-title").toLowerCase().indexOf(value) >
-          -1
-      );
+    var value = searchbox.value.toLowerCase();
+    document.querySelectorAll("#gamesRow div.game").forEach(function (el) {
+      var anchor = el.querySelector("a");
+      var title = (anchor ? anchor.title : "").toLowerCase();
+      el.style.display = title.indexOf(value) > -1 ? "" : "none";
     });
     updateGameCount();
     localStorage.removeItem("filterType");
     localStorage.removeItem("filterValue");
   }
 
-  $("#gameSearch").on("search", function () {
-    search($(this));
-  });
+  var gameSearch = document.getElementById("gameSearch");
+  if (gameSearch) {
+    gameSearch.addEventListener("search", function () {
+      search(this);
+    });
 
-  $("#gameSearch").on(
-    "keyup",
-    delay(function () {
-      search($(this));
-    }, 400)
-  );
+    gameSearch.addEventListener(
+      "keyup",
+      delay(function () {
+        search(this);
+      }, 400)
+    );
 
-  if ($("#gameSearch").val()) {
-    search($("#gameSearch"));
+    if (gameSearch.value) {
+      search(gameSearch);
+    }
   }
   checkFilter();
 
-  $("#randomSelect").on("click", function () {
-    var games = $(".game:visible");
-    var random = Math.floor(Math.random() * games.length);
-    games.eq(random).find("a")[0].click();
-  });
+  var randomSelect = document.getElementById("randomSelect");
+  if (randomSelect) {
+    randomSelect.addEventListener("click", function (e) {
+      e.preventDefault();
+      var games = Array.from(document.querySelectorAll(".game")).filter(function (el) {
+        return el.style.display !== "none";
+      });
+      if (games.length) {
+        var random = Math.floor(Math.random() * games.length);
+        games[random].querySelector("a").click();
+      }
+    });
+  }
 });

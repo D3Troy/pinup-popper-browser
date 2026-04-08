@@ -43,15 +43,12 @@ body {
 }
 
 .favorite {
-  content: "";
   position: absolute;
-  top: 10%;
-  right: 10%;
-  height: 16%;
-  width: 16%;
-  background-image: url("/images/favorite.png");
-  background-size: contain;
-  background-repeat: no-repeat;
+  top: 8%;
+  right: 8%;
+  font-size: 1.4rem;
+  color: gold;
+  text-shadow: 0 0 4px rgba(0,0,0,0.6);
 }
 
 .tooltip {

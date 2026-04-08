@@ -1,11 +1,10 @@
 extends layout
 
 block content
-  nav.navbar.fixed-top.navbar-dark.bg-dark
-    ul.navbar-nav.nav.ml-auto
-      li.nav-item
-        a(href='/', title="Home")
-          img(src="/images/home.png", alt="Home", width="35", height="35")
+  nav.navbar.fixed-top.px-3.bg-body-tertiary(data-bs-theme="dark")
+    div#navbarRight.d-flex.align-items-center.ms-auto.gap-2
+      a(href='/', title="Home")
+        i.bi.bi-house-fill.fs-3
   #game.container-fluid
     div.row
       div.col-sm-5.col-md-4.col-xl-3.mb-3
