@@ -97,6 +97,11 @@ async function start() {
   app.locals.queryRows = function (sql) {
     return queryRows(db, sql);
   };
+  app.locals.runSql = async function (sql, params) {
+    db.run(sql, params);
+    const data = db.export();
+    await fsPromises.writeFile(settings.pupServer.db.path, Buffer.from(data));
+  };
 
   // get global settings
   const globalRow = queryRow(
@@ -131,7 +136,7 @@ async function start() {
     "select g.GameID as gameId, g.EmuID as emuId, g.GameName as gameName, g.GameDisplay as gameDisplay, g.GameType as gameType, g.GameYear as gameYear, g.NumPlayers as numPlayers, g.Manufact as manufacturer, " +
     "s.LastPlayed as lastPlayed, s.NumberPlays as numberPlays, s.TimePlayedSecs as timePlayedSecs, g.Category as category, g.GameTheme as gameTheme, f.isFav as isFav, g.GameRating as gameRating " +
     "from games g join emulators e on g.emuid = e.emuid " +
-    "left join (SELECT GameID, 1 as isFav FROM Playlistdetails WHERE isFav > 0 GROUP BY GameID) f on g.gameid = f.gameid " +
+    "left join (SELECT GameID, MAX(isFav) as isFav FROM Playlistdetails WHERE isFav > 0 GROUP BY GameID) f on g.gameid = f.gameid " +
     "left join gamesstats s on g.gameid = s.gameid " +
     "where g.visible and e.visible " +
     (dbFilter ? " and " + dbFilter : "") +
@@ -161,7 +166,7 @@ async function start() {
       decade: row.gameYear
         ? parseInt(row.gameYear) - (parseInt(row.gameYear) % 10)
         : "",
-      favorite: row.isFav,
+      favorite: row.isFav || 0,
       rating: row.gameRating || 0,
     });
     gameIds.set(row.gameId, i);

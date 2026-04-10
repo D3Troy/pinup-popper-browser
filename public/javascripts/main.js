@@ -1,5 +1,46 @@
+function applyFavFromStorage() {
+  for (var i = 0; i < sessionStorage.length; i++) {
+    var key = sessionStorage.key(i);
+    if (!key || !key.startsWith("fav_")) continue;
+    var gid = key.slice(4);
+    var val = parseInt(sessionStorage.getItem(key), 10);
+    document.querySelectorAll(".favorite[data-gameid='" + gid + "']").forEach(function (s) {
+      s.dataset.fav = val;
+      s.classList.toggle("bi-star-fill", !!val);
+      s.classList.toggle("bi-star", !val);
+      var gameDiv = s.closest(".game");
+      if (gameDiv) gameDiv.dataset.fav = val;
+    });
+  }
+}
+
+window.addEventListener("pageshow", function (e) {
+  if (e.persisted) applyFavFromStorage();
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   lazyload();
+
+  document.addEventListener("click", function (e) {
+    var star = e.target.closest(".favorite[data-gameid]");
+    if (!star) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var gameId = star.dataset.gameid;
+    fetch("/games/" + gameId + "/fav", { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        sessionStorage.setItem("fav_" + gameId, data.favorite);
+        document.querySelectorAll(".favorite[data-gameid='" + gameId + "']").forEach(function (s) {
+          s.dataset.fav = data.favorite;
+          s.classList.toggle("bi-star-fill", !!data.favorite);
+          s.classList.toggle("bi-star", !data.favorite);
+          var gameDiv = s.closest(".game");
+          if (gameDiv) gameDiv.dataset.fav = data.favorite;
+        });
+      })
+      .catch(function (err) { console.error("fav toggle failed", err); });
+  });
 
   var htmlEl = document.documentElement;
   var toggleBtn = document.createElement("button");

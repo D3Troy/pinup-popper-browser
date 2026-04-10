@@ -34,8 +34,7 @@ block content
           div.col-sm-5.col-md-4.col-xl-3.mb-3
             div.wheel-wrap
               img.wheel.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
-              if game.favorite
-                i.bi.bi-star-fill.favorite(title="Favorite")
+              i.bi.favorite(class=game.favorite ? 'bi-star-fill' : 'bi-star', data-gameid=game.id, data-fav=game.favorite, title="Favorite")
           div.col
             h4.text-nowrap
               span.badge.bg-primary Year 

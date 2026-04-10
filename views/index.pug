@@ -70,5 +70,4 @@ block content
           div.wheel-wrap
             a(href='/games/'+game.id, title=game.display, data-bs-toggle='tooltip')
               img.wheel.img-fluid.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
-            if game.favorite
-              i.bi.bi-star-fill.favorite(title="Favorite")
+            i.bi.favorite(class=game.favorite ? 'bi-star-fill' : 'bi-star', data-gameid=game.id, data-fav=game.favorite, title="Favorite")

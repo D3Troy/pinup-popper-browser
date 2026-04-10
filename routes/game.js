@@ -27,6 +27,23 @@ function createRouter(settings) {
     getMediaFilenames(req, res, "GameInfo", ["png", "jpg"]);
   });
 
+  router.post("/:gameId/fav", function (req, res) {
+    const gameId = parseInt(req.params["gameId"], 10);
+    if (isNaN(gameId)) return res.status(400).json({ error: "Invalid input" });
+    const game = getGame(gameId, req);
+    if (!game) return res.status(404).json({ error: "Game not found" });
+
+    const newValue = game.favorite ? null : 1;
+    req.app.locals.runSql("UPDATE PlayListDetails SET isFav = ? WHERE GameID = ?", [newValue, gameId])
+      .then(function () {
+        game.favorite = newValue || 0;
+        res.json({ favorite: newValue || 0 });
+      })
+      .catch(function (err) {
+        res.status(500).json({ error: err.message });
+      });
+  });
+
   router.get("/:gameId/help", function (req, res) {
     getMediaFilenames(req, res, "GameHelp", ["png", "jpg"]);
   });

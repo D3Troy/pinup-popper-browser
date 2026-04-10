@@ -200,7 +200,8 @@ function createRouter(settings) {
             src: req.app.locals.getWheelSrc(game),
             placeholder: "/images/wheel_loading_" + rotation + ".gif",
             cssClass: rotation ? "rotate" + rotation : "",
-            favorite: !!game.favorite,
+            favorite: game.favorite || 0,
+            gameId: game.id,
         };
     }
 

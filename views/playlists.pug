@@ -34,5 +34,5 @@ block content
                 data-src=item.src,
                 alt=item.display
               )
-            if item.favorite
-              i.bi.bi-star-fill.favorite(title='Favorite')
+            if item.gameId
+              i.bi.favorite(class=item.favorite ? 'bi-star-fill' : 'bi-star', data-gameid=item.gameId, data-fav=item.favorite)

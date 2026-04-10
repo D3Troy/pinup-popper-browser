@@ -56,6 +56,18 @@ body {
   font-size: 12cqw;
   color: gold;
   text-shadow: 0 0 6px rgba(0,0,0,0.8);
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
+.favorite.bi-star-fill {
+  opacity: 1;
+}
+
+.wheel-wrap:hover .favorite,
+.wheel-wrap:focus-within .favorite {
+  opacity: 0.9;
 }
 
 .tooltip {

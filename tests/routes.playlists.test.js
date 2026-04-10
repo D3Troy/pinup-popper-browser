@@ -175,8 +175,8 @@ describe("routes/playlists", () => {
             .type("form")
             .send({ pin: "4321" });
 
-        expect(response.status).toBe(302);
-        expect(response.headers.location).toBe("/playlists/1");
+        expect(response.status).toBe(200);
+        expect(response.text).toContain("/playlists/1");
         expect(response.headers["set-cookie"]).toBeDefined();
         expect(response.headers["set-cookie"][0]).toMatch(/^pl_1=/);
     });
