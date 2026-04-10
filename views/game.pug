@@ -30,67 +30,75 @@ block content
   #game.container-fluid(data-gameid=game.id, data-refresh=refreshInterval)
     div.tab-content
       #home.tab-pane.fade
-        div.row
-          div.col-sm-5.col-md-4.col-xl-3.mb-3
+        div.game-home-layout
+          div.game-wheel-col
             div.wheel-wrap
               img.wheel.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
               i.bi.favorite(class=game.favorite ? 'bi-star-fill' : 'bi-star', data-gameid=game.id, data-fav=game.favorite, title="Favorite")
-          div.col
-            h4.text-nowrap
-              span.badge.bg-primary Year 
-                span.badge.bg-light.text-dark #{game.year}
-              span.badge.bg-dark.ms-2 Type 
-                span.badge.bg-light.text-dark #{game.type}
-            h4
-              span.badge.bg-secondary Manufacturer 
-                span.badge.bg-light.text-dark #{game.manufacturer}
-            h4
-              span.badge.bg-success Number of Players 
-                span.badge.bg-light.text-dark #{game.numPlayers}
-            h4
-              span.badge.bg-danger Emulator 
-                span.badge.bg-light.text-dark #{game.emulator.name}                
-            h4
-              span.badge.bg-warning.text-dark Times Played 
-                span.badge.bg-light.text-dark #{game.numPlays || 0}    
-            h4
-              span.badge.bg-info.text-dark Last Played 
-                span.badge.bg-light.text-dark #{game.lastPlayed ? game.lastPlayed.toLocaleString() : 'Never'}                        
-            h4
-              span.badge.bg-secondary.me-2 Rating
-              span.rating-wrap(data-gameid=game.id, data-rating=game.rating)
-                each n in [1,2,3,4,5]
-                  i.bi.rating-star(class=(game.rating >= n ? 'bi-star-fill' : 'bi-star'), data-value=n)
-            hr
-            div.row
-              div.col
-                button#btnLaunch.btn.btn-primary(type='button', data-id=game.id) Launch Game
-                button#btnBack.btn.btn-secondary.ms-2(type='button', data-back-url=playlistId ? '/playlists/' + playlistId : null) Go Back
-            div.row.mt-2
-              #response.col
-            div.row.mt-2
-              div.col
-                button#btnExit.btn.btn-primary(type='button', data-id=game.id) Exit Current Game
-
-      #info.tab-pane.fade
-        #carouselInfo.carousel.slide(data-bs-ride='carousel')
-          div.carousel-inner
-          button.carousel-control-prev(type='button', data-bs-target='#carouselInfo', data-bs-slide='prev')
-            span.carousel-control-prev-icon(aria-hidden='true')
-            span.visually-hidden Previous
-          button.carousel-control-next(type='button', data-bs-target='#carouselInfo', data-bs-slide='next')
-            span.carousel-control-next-icon(aria-hidden='true')
-            span.visually-hidden Next
-      #help.tab-pane.fade
-        #carouselHelp.carousel.slide(data-bs-ride='carousel')
-          div.carousel-inner
-          button.carousel-control-prev(type='button', data-bs-target='#carouselHelp', data-bs-slide='prev')
-            span.carousel-control-prev-icon(aria-hidden='true')
-            span.visually-hidden Previous
-          button.carousel-control-next(type='button', data-bs-target='#carouselHelp', data-bs-slide='next')
-            span.carousel-control-next-icon(aria-hidden='true')
-            span.visually-hidden Next
-      #playfield.tab-pane.fade(data-rotate=playfieldRotation)
+          div.game-right-col
+            div.game-info-card
+              div.game-stats
+                -
+                  const fieldMeta = {
+                    year:            { icon: 'calendar3',          label: 'Year' },
+                    type:            { icon: 'controller',          label: 'Type' },
+                    manufacturer:    { icon: 'building',            label: 'Manufacturer' },
+                    numPlayers:      { icon: 'people',              label: 'Players' },
+                    emulator:        { icon: 'cpu',                 label: 'Emulator' },
+                    category:        { icon: 'tag',                 label: 'Category' },
+                    theme:           { icon: 'palette',             label: 'Theme' },
+                    lastPlayed:      { icon: 'clock-history',       label: 'Last Played' },
+                    numPlays:        { icon: 'play-circle',         label: 'Times Played' },
+                    timePlayed:      { icon: 'hourglass-split',     label: 'Time Played' },
+                    designedBy:      { icon: 'person-badge',        label: 'Designed By' },
+                    webLinkUrl:      { icon: 'link-45deg',          label: 'Web Link' },
+                    gameVersion:     { icon: 'hash',                label: 'Version' },
+                    gameDescription: { icon: 'info-circle',         label: 'Description' },
+                    romName:         { icon: 'file-earmark-binary', label: 'ROM' },
+                    tableType:       { icon: 'table',               label: 'Table Type' },
+                  }
+                each field in gameFields
+                  - const meta = fieldMeta[field]
+                  if field === 'rating'
+                    div.game-stat
+                      i.bi.bi-star-half.game-stat-icon
+                      span.game-stat-label Rating
+                      span.game-stat-value
+                        span.rating-wrap(data-gameid=game.id, data-rating=game.rating)
+                          each n in [1,2,3,4,5]
+                            i.bi.rating-star(class=(game.rating >= n ? 'bi-star-fill' : 'bi-star'), data-value=n)
+                  else if meta
+                    div.game-stat
+                      i(class=`bi bi-${meta.icon} game-stat-icon`)
+                      span.game-stat-label #{meta.label}
+                      if field === 'lastPlayed'
+                        if game.lastPlayed
+                          span.game-stat-value(data-lastplayed=game.lastPlayed data-dateformat=dateFormat data-locale=locale) Loading…
+                        else
+                          span.game-stat-value Never
+                      else if field === 'timePlayed'
+                        - var t = game.timePlayed || 0; var h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = t%60
+                        span.game-stat-value #{t ? (h ? h+'h ' : '') + (m ? m+'m ' : (h ? '0m ' : '')) + s+'s' : '—'}
+                      else if field === 'webLinkUrl'
+                        if game.webLinkUrl
+                          span.game-stat-value
+                            a(href=game.webLinkUrl target="_blank") #{game.webLinkUrl}
+                        else
+                          span.game-stat-value —
+                      else if field === 'emulator'
+                        span.game-stat-value #{game.emulator && game.emulator.name || '—'}
+                      else
+                        - const val = game[field]
+                        span.game-stat-value #{(val !== undefined && val !== null && val !== '') ? val : '—'}
+            div.game-actions
+              #response.mb-2
+              div.d-flex.align-items-center.gap-2
+                button#btnBack.btn.btn-secondary(type='button', data-back-url=playlistId ? '/playlists/' + playlistId : null)
+                  i.bi.bi-arrow-left-circle
+                  span.btn-label-back.ms-1 Go Back
+                div.ms-auto.d-flex.align-items-center.gap-2
+                  button#btnExit.btn.btn-warning(type='button', data-id=game.id) Exit Current Game
+                  button#btnLaunch.btn.btn-primary.px-4(type='button', data-id=game.id) Launch Game
 
       if media
         - const hasLeftMedia = !!(media.topper || media.backglass || media.dmd || media.info || media.help)
@@ -124,6 +132,26 @@ block content
                 .media-ov-slot-wrap
                   #mediaPlayfield.media-ov-slot
 
+      #info.tab-pane.fade
+        #carouselInfo.carousel.slide(data-bs-ride='carousel')
+          div.carousel-inner
+          button.carousel-control-prev(type='button', data-bs-target='#carouselInfo', data-bs-slide='prev')
+            span.carousel-control-prev-icon(aria-hidden='true')
+            span.visually-hidden Previous
+          button.carousel-control-next(type='button', data-bs-target='#carouselInfo', data-bs-slide='next')
+            span.carousel-control-next-icon(aria-hidden='true')
+            span.visually-hidden Next
+      #help.tab-pane.fade
+        #carouselHelp.carousel.slide(data-bs-ride='carousel')
+          div.carousel-inner
+          button.carousel-control-prev(type='button', data-bs-target='#carouselHelp', data-bs-slide='prev')
+            span.carousel-control-prev-icon(aria-hidden='true')
+            span.visually-hidden Previous
+          button.carousel-control-next(type='button', data-bs-target='#carouselHelp', data-bs-slide='next')
+            span.carousel-control-next-icon(aria-hidden='true')
+            span.visually-hidden Next
+      #playfield.tab-pane.fade(data-rotate=playfieldRotation)
+
       if highscore
         #highscore.tab-pane.fade
           #carouselHighscore.carousel.slide(data-bs-ride='carousel')
@@ -134,5 +162,3 @@ block content
             button.carousel-control-next(type='button', data-bs-target='#carouselHighscore', data-bs-slide='next')
               span.carousel-control-next-icon(aria-hidden='true')
               span.visually-hidden Next
-
-

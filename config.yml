@@ -26,11 +26,29 @@ options:
     highscore: true
     media:
       topper: false
-      backglass: false
-      dmd: false
+      backglass: true
+      dmd: true
       playfield: true
-      help: false
-      info: false
+      help: true
+      info: true
+  dateFormat: dd.MM.yyyy HH.mm
+
+  # Available fields: year, type, manufacturer, numPlayers, emulator,
+  #   category, theme, rating, lastPlayed, numPlays, timePlayed,
+  #   designedBy, webLinkUrl, gameVersion, gameDescription, romName, tableType
+  gameFields:
+    - year
+    - type
+    - manufacturer
+    - numPlayers
+    - emulator
+    - lastPlayed
+    - numPlays
+    - timePlayed
+    - designedBy
+    - webLinkUrl
+    - gameVersion
+    - romName
 
 media:
   useThumbs: true

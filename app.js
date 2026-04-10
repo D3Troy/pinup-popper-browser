@@ -134,7 +134,8 @@ async function start() {
 
   let sql =
     "select g.GameID as gameId, g.EmuID as emuId, g.GameName as gameName, g.GameDisplay as gameDisplay, g.GameType as gameType, g.GameYear as gameYear, g.NumPlayers as numPlayers, g.Manufact as manufacturer, " +
-    "s.LastPlayed as lastPlayed, s.NumberPlays as numberPlays, s.TimePlayedSecs as timePlayedSecs, g.Category as category, g.GameTheme as gameTheme, f.isFav as isFav, g.GameRating as gameRating " +
+    "s.LastPlayed as lastPlayed, s.NumberPlays as numberPlays, s.TimePlayedSecs as timePlayedSecs, g.Category as category, g.GameTheme as gameTheme, f.isFav as isFav, g.GameRating as gameRating, " +
+    "g.DesignedBy as designedBy, g.WebLinkURL as webLinkUrl, g.GAMEVER as gameVersion, g.ROM as romName, g.Manufact as manufacturer " +
     "from games g join emulators e on g.emuid = e.emuid " +
     "left join (SELECT GameID, MAX(isFav) as isFav FROM Playlistdetails WHERE isFav > 0 GROUP BY GameID) f on g.gameid = f.gameid " +
     "left join gamesstats s on g.gameid = s.gameid " +
@@ -168,7 +169,14 @@ async function start() {
         : "",
       favorite: row.isFav || 0,
       rating: row.gameRating || 0,
+      designedBy: row.designedBy,
+      webLinkUrl: row.webLinkUrl,
+      gameVersion: row.gameVersion,
+      romName: row.romName,
+      manufacturer: row.manufacturer,
     });
+      app.locals.gameFields = (settings.options && settings.options.gameFields) || [
+        'year','type','manufacturer','numPlayers','emulator','category','theme','lastPlayed','numPlays','rating','designedBy','webLinkUrl','gameVersion','romName','timePlayed']
     gameIds.set(row.gameId, i);
     i++;
   });
@@ -177,6 +185,9 @@ async function start() {
   app.locals.gameIds = gameIds;
   app.locals.globalSettings = globalSettings;
   app.locals.settings = settings;
+  app.locals.dateFormat = (settings.options && settings.options.dateFormat) || 'medium';
+  app.locals.timeFormat = (settings.options && settings.options.timeFormat) || 'short';
+  app.locals.locale = (settings.options && settings.options.locale) || undefined;
 
   app.locals.getWheelSrc = function (game) {
     let name = game.name;

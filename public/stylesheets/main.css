@@ -77,7 +77,7 @@ body {
 .rating-wrap {
   display: inline-flex;
   gap: 0.15em;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   color: gold;
   vertical-align: middle;
@@ -108,7 +108,155 @@ body {
   }
 }
 
-/* Playlists */
+/* Mobile: larger touch targets for buttons, nav links, dropdown items */
+@media (max-width: 767px) {
+  .btn-mobile {
+    padding: 0.625rem 1rem;
+    font-size: 1.1rem;
+  }
+
+  .nav-link,
+  .dropdown-item {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .navbar-toggler {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Game action buttons */
+.game-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  align-items: center;
+}
+
+@media (max-width: 575px) {
+  .game-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background-color: var(--bs-body-bg);
+    border-top: 1px solid var(--bs-border-color);
+    padding: 0.5rem 0.75rem;
+  }
+
+  body {
+    padding-bottom: 70px;
+  }
+
+  .btn-label-back {
+    display: none;
+  }
+}
+
+/* Game home layout */
+.game-home-layout {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  align-items: flex-start;
+  max-width: 960px;
+}
+
+.game-wheel-col {
+  flex: 0 0 clamp(180px, 30%, 320px);
+}
+
+.game-right-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-info-card {
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.1rem 1.5rem;
+}
+
+.game-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.game-stat:last-child {
+  border-bottom: none;
+}
+
+.game-stat-icon {
+  font-size: 0.85rem;
+  color: var(--bs-secondary-color);
+  flex-shrink: 0;
+}
+
+.game-stat-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.game-stat-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-left: auto;
+  text-align: right;
+  word-break: break-word;
+}
+
+.game-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+@media (max-width: 575px) {
+  .game-home-layout {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+
+  .game-wheel-col {
+    flex: none;
+    width: 55%;
+    align-self: center;
+  }
+
+  .game-right-col {
+    width: 100%;
+  }
+
+  .game-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 #playlistsRow,
 #gamesRow {
   display: flex;

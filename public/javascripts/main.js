@@ -19,6 +19,32 @@ window.addEventListener("pageshow", function (e) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('[data-lastplayed]').forEach(function(el) {
+    var raw = el.getAttribute('data-lastplayed');
+    var dateFormat = el.getAttribute('data-dateformat');
+    var locale = el.getAttribute('data-locale') || undefined;
+    function pad(n, l=2) { return n.toString().padStart(l, '0'); }
+    if (raw && !isNaN(Date.parse(raw))) {
+      var date = new Date(raw);
+      if (dateFormat && /[dMyHhms]/.test(dateFormat)) {
+        // Simple pattern replacement: dd.MM.yyyy HH.mm
+        var map = {
+          dd: pad(date.getDate()),
+          MM: pad(date.getMonth()+1),
+          yyyy: date.getFullYear(),
+          HH: pad(date.getHours()),
+          mm: pad(date.getMinutes()),
+          ss: pad(date.getSeconds()),
+        };
+        var out = dateFormat.replace(/dd|MM|yyyy|HH|mm|ss/g, function(k){return map[k]||k;});
+        el.textContent = out;
+      } else {
+        el.textContent = date.toLocaleString(locale, dateFormat ? { dateStyle: dateFormat, timeStyle: dateFormat } : undefined);
+      }
+    } else {
+      el.textContent = raw || '';
+    }
+  });
   lazyload();
 
   document.addEventListener("click", function (e) {
