@@ -144,14 +144,15 @@ function createRouter(settings) {
     }
   }
 
-  function escapeRegExp(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g, "\\$&");
+  function escapeGlob(text) {
+    return text.replace(/[*?[\]{}()!@+^]/g, (c) => `[${c}]`);
   }
 
   function getMediaFilenames(req, res, mediaDir, extensions) {
     const game = getGame(req.params["gameId"], req);
+    if (!game) { res.send([]); return; }
     const patterns = extensions.map(
-      (ext) => escapeRegExp(game.name) + "*." + ext
+      (ext) => escapeGlob(game.name) + "*." + ext
     );
     const dir = game.emulator.dirMedia.replace(/\\/g, "/") + "/" + mediaDir;
     const files = fs.globSync(patterns, { cwd: dir });
