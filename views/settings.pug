@@ -1,0 +1,391 @@
+extends layout
+
+block content
+  div.settings-page
+    div.settings-header.d-flex.align-items-center.gap-3.mb-4
+      h2.mb-0 Settings
+
+    form#settingsForm(method='post', action='/settings')
+
+      
+      // General settings section
+      section.settings-section
+        h5.settings-section-title General
+        p.settings-desc Controls startup behavior and display format.
+
+        div.settings-row
+          div.settings-field-group
+            label.settings-label Default View
+            p.settings-field-hint Page shown when opening the root URL.
+          div.view-picker
+            label.view-card(class=cfg.options.defaultView === 'home' ? 'active' : '')
+              input(type='radio', name='defaultView', value='home', checked=cfg.options.defaultView === 'home')
+              div.view-mock.view-mock--home
+                div.view-mock-nav
+                div.view-mock-grid
+                  each src in homeSamples
+                    img.view-mock-dot(src=src, onerror="this.src='/images/unavailable.png'")
+              span Home
+            label.view-card(class=cfg.options.defaultView === 'playlists' ? 'active' : '')
+              input(type='radio', name='defaultView', value='playlists', checked=cfg.options.defaultView === 'playlists')
+              div.view-mock.view-mock--playlists
+                div.view-mock-nav
+                div.view-mock-grid
+                  each src in playlistSamples
+                    img.view-mock-dot(src=src, onerror="this.src='/images/unavailable.png'")
+              span Playlists
+
+        div.settings-row
+          div.settings-field-group
+            label.settings-label Date Format
+            p.settings-field-hint e.g. #[span#dateFormatPreview #{dateFormatExample}]
+          input.form-control.settings-input(type='text', name='dateFormat', value=cfg.options.dateFormat, placeholder='dd.MM.yyyy HH.mm')
+
+      
+      // Filters section for dropdowns
+      section.settings-section
+        h5.settings-section-title Filters
+        p.settings-desc Filter dropdowns shown on the home and playlist views. Each is populated from unique values in the database.
+        div.settings-checks
+          each key in ['category', 'theme', 'type', 'decade', 'emulator', 'manufacturer', 'favorites']
+            label.settings-check
+              input(type='checkbox', name=`filters.${key}`, checked=cfg.options.filters && cfg.options.filters[key])
+              span= key.charAt(0).toUpperCase() + key.slice(1)
+
+      
+      // Game view tabs section
+      section.settings-section
+        h5.settings-section-title Game View Tabs
+        p.settings-desc Controls which tabs appear on the game detail page.
+        div.settings-checks
+          each key in ['info', 'help', 'playfield', 'highscore']
+            label.settings-check
+              input(type='checkbox', name=`game.${key}`, checked=cfg.options.game && cfg.options.game[key])
+              span= key.charAt(0).toUpperCase() + key.slice(1)
+        div.settings-media-block.mt-3
+          p.settings-sublabel Media Slots
+          p.settings-field-hint Which panels appear in the Media overview tab.
+          div.settings-checks
+            each slot in ['topper', 'backglass', 'dmd', 'playfield', 'help', 'info']
+              label.settings-check
+                input(type='checkbox', name=`game.media.${slot}`, checked=cfg.options.game && cfg.options.game.media && cfg.options.game.media[slot])
+                span= slot.charAt(0).toUpperCase() + slot.slice(1)
+
+      
+      // Game fields section with drag-and-drop and preview
+      section.settings-section.settings-section--wide
+        h5.settings-section-title Game Fields
+        p.settings-desc Fields shown in the game stats table. Drag to reorder, uncheck to hide. The preview mirrors the real game page.
+        div.settings-fields-layout
+          
+          // Draggable field list (left column)
+          div.settings-fields-col
+            div.d-flex.align-items-center.justify-content-between.mb-2
+              p.settings-sublabel.mb-0 Drag to reorder · uncheck to hide
+              button#togglePreview.btn.btn-outline-secondary.btn-sm.d-md-none(type='button', aria-controls='fieldsPreviewMobile', aria-expanded='false') Show Preview
+            ul#fieldsList.settings-fields-list
+              each field in gameFields
+                li.settings-field-item(draggable='true', data-field=field)
+                  i.bi.bi-grip-vertical.drag-handle
+                  label.field-check
+                    input(type='checkbox', checked=true)
+                    span= field
+              - const inactive = allFields.filter(function(f){ return gameFields.indexOf(f) === -1; })
+              each field in inactive
+                li.settings-field-item.inactive(draggable='true', data-field=field)
+                  i.bi.bi-grip-vertical.drag-handle
+                  label.field-check
+                    input(type='checkbox', checked=false)
+                    span= field
+
+          
+          // Live preview (right column)
+          div.settings-preview-col#fieldsPreviewMobile
+            p.settings-sublabel
+              | Live preview
+              if previewGame
+                span.settings-preview-game-name  · #{previewGame.display}
+            if previewGame
+              
+              div.settings-game-preview
+                div.game-home-layout
+                  div.game-wheel-col
+                    div.wheel-wrap
+                      img.wheel(
+                        class='rotate'+wheelRotation,
+                        src=wheelSrc,
+                        onerror="this.src='/images/unavailable.png'")
+                  div.game-right-col
+                    div.game-info-card
+                      div.game-stats#fieldsPreview
+                    div.game-actions
+                      div.d-flex.align-items-center.gap-2
+                        button.btn.btn-secondary(type='button', disabled)
+                          i.bi.bi-arrow-left-circle
+                          span.btn-label-back.ms-1 Go Back
+                        div.ms-auto.d-flex.align-items-center.gap-2
+                          button.btn.btn-warning(type='button', disabled) Exit Current Game
+                          button.btn.btn-primary.px-4(type='button', disabled) Launch Game
+            else
+              p.text-muted.small No games available for preview.
+
+      
+      // Media settings section
+      section.settings-section
+        h5.settings-section-title Media
+        p.settings-desc Controls how media files are served and cached.
+        div.settings-checks
+          label.settings-check
+            input(type='checkbox', name='media.useThumbs', checked=cfg.media.useThumbs)
+            div
+              span Use Thumbnails
+              p.settings-field-hint Use pre-generated thumbnail Wheel images. Improves load time on slower connections.
+          label.settings-check
+            input(type='checkbox', name='media.playfieldRotation', checked=cfg.media.playfieldRotation)
+            div
+              span Rotate Playfield
+              p.settings-field-hint Rotate playfield images/videos 90° for portrait-oriented monitors.
+        div.settings-row.mt-3
+          div.settings-field-group
+            label.settings-label Cache (minutes)
+            p.settings-field-hint How long the browser caches media files. Set to 0 to disable.
+          input.form-control.settings-input(type='number', name='media.cacheInMinutes', value=cfg.media.cacheInMinutes, min='0')
+
+      div.settings-footer
+        a.btn.btn-secondary(href='/') Cancel
+        button.btn.btn-primary.px-4(type='submit') Save Settings
+
+  // Settings page scripts for preview, drag-and-drop, and form logic
+  script.
+    // Preview game object for live preview rendering
+    var PREVIEW_GAME = !{previewGame ? JSON.stringify(previewGame) : 'null'};
+
+    
+    // Metadata for each configurable field (icon and label)
+    var FIELD_META = {
+      year:            { icon: 'calendar3',          label: 'Year' },
+      type:            { icon: 'controller',          label: 'Type' },
+      manufacturer:    { icon: 'building',            label: 'Manufacturer' },
+      numPlayers:      { icon: 'people',              label: 'Players' },
+      emulator:        { icon: 'cpu',                 label: 'Emulator' },
+      category:        { icon: 'tag',                 label: 'Category' },
+      theme:           { icon: 'palette',             label: 'Theme' },
+      rating:          { icon: 'star-half',           label: 'Rating' },
+      lastPlayed:      { icon: 'clock-history',       label: 'Last Played' },
+      numPlays:        { icon: 'play-circle',         label: 'Times Played' },
+      timePlayed:      { icon: 'hourglass-split',     label: 'Time Played' },
+      designedBy:      { icon: 'person-badge',        label: 'Designed By' },
+      webLinkUrl:      { icon: 'link-45deg',          label: 'Web Link' },
+      gameVersion:     { icon: 'hash',                label: 'Version' },
+      gameDescription: { icon: 'info-circle',         label: 'Description' },
+      romName:         { icon: 'file-earmark-binary', label: 'ROM' },
+      tableType:       { icon: 'table',               label: 'Table Type' },
+    };
+
+    
+    // Returns the display HTML for a field value, mirroring game.pug rendering
+    function fieldValueHtml(field, game) {
+      if (field === 'emulator') {
+        return esc((game.emulator && game.emulator.name) || '—');
+      }
+      if (field === 'lastPlayed') {
+        return game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : 'Never';
+      }
+      if (field === 'timePlayed') {
+        var t = game.timePlayed || 0;
+        if (!t) return '—';
+        var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+        return (h ? h + 'h ' : '') + (m ? m + 'm ' : (h ? '0m ' : '')) + s + 's';
+      }
+      if (field === 'rating') {
+        // Render actual Bootstrap star icons so the preview matches the game page exactly
+        var r = parseInt(game.rating, 10) || 0;
+        var html = '';
+        for (var i = 1; i <= 5; i++) {
+          html += '<i class="bi bi-' + (i <= r ? 'star-fill' : 'star') + ' rating-star"></i>';
+        }
+        return html;
+      }
+      var v = game[field];
+      return esc((v !== undefined && v !== null && v !== '') ? String(v) : '—');
+    }
+
+    
+    // Escapes a string for safe insertion as HTML text content
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    
+    // Rebuilds the preview stats table from the current field list state
+    function renderPreview() {
+      var preview = document.getElementById('fieldsPreview');
+      if (!preview || !PREVIEW_GAME) return;
+      var items = Array.from(document.querySelectorAll('#fieldsList .settings-field-item'));
+      preview.innerHTML = '';
+      items.forEach(function (li) {
+        if (!li.querySelector('input[type=checkbox]').checked) return;
+        var field = li.dataset.field;
+        var meta  = FIELD_META[field];
+        if (!meta) return;
+        var row = document.createElement('div');
+        row.className = 'game-stat';
+        row.innerHTML =
+          '<i class="bi bi-' + meta.icon + ' game-stat-icon"></i>' +
+          '<span class="game-stat-label">' + meta.label + '</span>' +
+          '<span class="game-stat-value">' + fieldValueHtml(field, PREVIEW_GAME) + '</span>';
+        preview.appendChild(row);
+      });
+    }
+
+    
+    // Writes the ordered, active field names into hidden form inputs before submit
+    function syncHiddenFields() {
+      document.querySelectorAll('input[name="gameFields"]').forEach(function (i) { i.remove(); });
+      var form = document.getElementById('settingsForm');
+      document.querySelectorAll('#fieldsList .settings-field-item').forEach(function (li) {
+        if (!li.querySelector('input[type=checkbox]').checked) return;
+        var inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = 'gameFields';
+        inp.value = li.dataset.field;
+        form.appendChild(inp);
+      });
+    }
+
+    // DOMContentLoaded: setup event listeners and initialize preview
+    document.addEventListener('DOMContentLoaded', function () {
+      renderPreview();
+
+      // Toggle inactive style and refresh preview when a field checkbox changes
+      // Checkbox change: toggle inactive style and refresh preview
+      document.querySelectorAll('#fieldsList input[type=checkbox]').forEach(function (cb) {
+        cb.addEventListener('change', function () {
+          cb.closest('.settings-field-item').classList.toggle('inactive', !cb.checked);
+          renderPreview();
+        });
+      });
+
+
+      // Drag-and-drop logic for mouse and touch
+      var list = document.getElementById('fieldsList');
+
+      // Shared: insert dragSrc before or after target based on pointer position
+      function reorderItem(dragSrc, clientY) {
+        var items = Array.from(list.querySelectorAll('.settings-field-item'));
+        for (var i = 0; i < items.length; i++) {
+          var t = items[i];
+          if (t === dragSrc) continue;
+          var rect = t.getBoundingClientRect();
+          if (clientY < rect.top + rect.height / 2) {
+            list.insertBefore(dragSrc, t);
+            renderPreview();
+            return;
+          }
+        }
+        list.appendChild(dragSrc);
+        renderPreview();
+      }
+
+      // Mouse drag (desktop)
+      var mouseSrc = null;
+
+      list.addEventListener('dragstart', function (e) {
+        mouseSrc = e.target.closest('.settings-field-item');
+        if (!mouseSrc) return;
+        mouseSrc.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      list.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        if (!mouseSrc) return;
+        reorderItem(mouseSrc, e.clientY);
+      });
+
+      list.addEventListener('dragend', function () {
+        if (mouseSrc) mouseSrc.classList.remove('dragging');
+        mouseSrc = null;
+      });
+
+      // Touch drag (mobile)
+      var touchSrc  = null;
+      var touchClone = null;
+
+      list.addEventListener('touchstart', function (e) {
+        var handle = e.target.closest('.drag-handle');
+        if (!handle) return;
+        touchSrc = handle.closest('.settings-field-item');
+        if (!touchSrc) return;
+
+        touchSrc.classList.add('dragging');
+        var rect  = touchSrc.getBoundingClientRect();
+        var touch = e.touches[0];
+
+        touchClone = touchSrc.cloneNode(true);
+        touchClone.style.cssText =
+          'position:fixed;pointer-events:none;z-index:9999;opacity:0.85;' +
+          'width:' + rect.width + 'px;' +
+          'left:' + rect.left + 'px;' +
+          'top:'  + (touch.clientY - rect.height / 2) + 'px;';
+        document.body.appendChild(touchClone);
+        e.preventDefault();
+      }, { passive: false });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!touchSrc) return;
+        e.preventDefault();
+        var touch = e.touches[0];
+
+        // Keep the clone centred on the finger
+        touchClone.style.top = (touch.clientY - touchSrc.offsetHeight / 2) + 'px';
+
+        // Temporarily hide the clone to let elementFromPoint see what's underneath
+        touchClone.style.visibility = 'hidden';
+        var el = document.elementFromPoint(touch.clientX, touch.clientY);
+        touchClone.style.visibility = '';
+
+        if (el && list.contains(el)) {
+          reorderItem(touchSrc, touch.clientY);
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchend', function () {
+        if (!touchSrc) return;
+        touchSrc.classList.remove('dragging');
+        touchSrc = null;
+        if (touchClone) { touchClone.remove(); touchClone = null; }
+      });
+
+      // Highlight the selected default-view card
+      // Highlight the selected default-view card
+      document.querySelectorAll('input[name="defaultView"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+          document.querySelectorAll('.view-card').forEach(function (c) {
+            c.classList.toggle('active', c.querySelector('input').value === r.value);
+          });
+        });
+      });
+
+      // Sync hidden fields on form submit
+      document.getElementById('settingsForm').addEventListener('submit', syncHiddenFields);
+
+      // Live date format preview
+      // Live date format preview logic
+      var dateInput   = document.querySelector('input[name="dateFormat"]');
+      var datePreview = document.getElementById('dateFormatPreview');
+      function refreshDatePreview() {
+        var fmt = dateInput.value.trim();
+        var now = new Date();
+        function pad(n) { return n.toString().padStart(2, '0'); }
+        if (fmt && /[dMyHhms]/.test(fmt)) {
+          var map = { dd: pad(now.getDate()), MM: pad(now.getMonth()+1), yyyy: now.getFullYear(), HH: pad(now.getHours()), mm: pad(now.getMinutes()), ss: pad(now.getSeconds()) };
+          datePreview.textContent = fmt.replace(/dd|MM|yyyy|HH|mm|ss/g, function(k){ return map[k] || k; });
+        } else {
+          datePreview.textContent = now.toLocaleString();
+        }
+      }
+      dateInput.addEventListener('input', refreshDatePreview);
+    });

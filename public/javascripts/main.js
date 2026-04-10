@@ -1,3 +1,14 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var toggleBtn = document.getElementById('togglePreview');
+  var previewCol = document.getElementById('fieldsPreviewMobile');
+  if (toggleBtn && previewCol) {
+    toggleBtn.addEventListener('click', function () {
+      var isVisible = previewCol.classList.toggle('visible');
+      toggleBtn.setAttribute('aria-expanded', isVisible);
+      previewCol.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+});
 function applyFavFromStorage() {
   for (var i = 0; i < sessionStorage.length; i++) {
     var key = sessionStorage.key(i);

@@ -256,6 +256,263 @@ body {
   }
 }
 
+#settingsBtn {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 1040;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bs-secondary-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  font-size: 1.1rem;
+  text-decoration: none;
+  opacity: 0.55;
+  transition: opacity 0.2s, transform 0.2s;
+}
+#settingsBtn:hover {
+  opacity: 1;
+  transform: rotate(30deg);
+  color: var(--bs-body-color);
+}
+
+.settings-page {
+  max-width: 1280px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 4rem;
+}
+.settings-section {
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.settings-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.25rem;
+}
+.settings-desc {
+  font-size: 0.82rem;
+  color: var(--bs-secondary-color);
+  margin-bottom: 1rem;
+}
+.settings-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.settings-field-group { min-width: 160px; flex-shrink: 0; }
+.settings-label {
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.1rem;
+}
+.settings-field-hint {
+  font-size: 0.76rem;
+  color: var(--bs-secondary-color);
+  margin: 0;
+}
+.settings-input { max-width: 260px; }
+.settings-sublabel {
+  font-size: 0.78rem;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.4rem;
+}
+.settings-preview-game-name {
+  font-style: italic;
+}
+
+.view-picker { display: flex; gap: 1rem; }
+.view-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid var(--bs-border-color);
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--bs-secondary-color);
+  transition: border-color 0.15s, color 0.15s;
+  width: 360px;
+}
+.view-card input { display: none; }
+.view-card i { font-size: 1.5rem; }
+.view-card.active { border-color: var(--bs-primary); color: var(--bs-primary); }
+
+.view-mock {
+  width: 100%;
+  background: var(--bs-body-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--bs-border-color-translucent);
+}
+.view-mock-nav {
+  height: 10px;
+  background: var(--bs-dark-bg-subtle);
+}
+.view-mock-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4px;
+  padding: 6px;
+  height: 150px;
+  overflow: hidden;
+}
+.view-mock-dot {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bs-secondary-bg);
+  display: block;
+}
+
+.settings-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.5rem;
+}
+.settings-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.settings-check input { cursor: pointer; margin-top: 0.2rem; }
+.settings-media-block {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+.settings-fields-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.settings-fields-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.settings-field-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color-translucent);
+  cursor: grab;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+.settings-field-item.inactive { opacity: 0.35; }
+.settings-field-item.dragging { opacity: 0.45; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.drag-handle { color: var(--bs-secondary-color); flex-shrink: 0; }
+.field-check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin: 0;
+}
+.field-check input { cursor: pointer; }
+
+.settings-game-preview {
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+.settings-game-preview .game-home-layout {
+  max-width: 100%;
+  padding: 0.75rem 1rem;
+  gap: 1rem;
+}
+.settings-game-preview .game-wheel-col {
+  flex: 0 0 clamp(120px, 30%, 190px);
+}
+.settings-game-preview .game-info-card {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.settings-game-preview .game-actions {
+  position: static;
+  border-top: 1px solid var(--bs-border-color-translucent);
+  padding: 0.5rem 0;
+}
+
+.settings-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .settings-page { padding: 0 0.75rem 5rem; }
+  .settings-section { padding: 1rem; }
+
+  .settings-row { flex-direction: column; gap: 0.4rem; }
+  .settings-field-group { min-width: unset; }
+  .settings-input { max-width: 100%; width: 100%; }
+
+  .view-card { width: auto; flex: 1 1 0; min-width: 0; padding: 0.5rem; }
+
+  .settings-fields-layout { grid-template-columns: 1fr; }
+  .settings-preview-col { display: none; }
+  .settings-preview-col.visible { display: block; }
+
+  .settings-field-item {
+    padding: 0.6rem 0.75rem;
+    min-height: 2.75rem;
+  }
+  .drag-handle {
+    font-size: 1.25rem;
+    padding: 0.25rem 0.5rem;
+    margin: -0.25rem -0.25rem -0.25rem -0.5rem;
+  }
+  .field-check { font-size: 1rem; }
+  .field-check input { width: 1.1rem; height: 1.1rem; }
+
+  .settings-check { padding: 0.35rem 0; }
+  .settings-check input { width: 1.1rem; height: 1.1rem; }
+
+  .settings-footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bs-body-bg);
+    border-top: 1px solid var(--bs-border-color);
+    padding: 0.75rem 1rem;
+    z-index: 1030;
+  }
+
+  #togglePreview {
+    display: inline-block;
+  }
+  #fieldsPreviewMobile.visible {
+    display: block !important;
+  }
+}
 
 #playlistsRow,
 #gamesRow {

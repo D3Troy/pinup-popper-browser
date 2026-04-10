@@ -10,6 +10,7 @@ var initSqlJs = require("sql.js");
 var createRouteIndex = require("./routes/index");
 var createRouteGame = require("./routes/game");
 var createRoutePlaylists = require("./routes/playlists");
+var createRouteSettings = require("./routes/settings");
 
 var app = express();
 
@@ -238,6 +239,7 @@ async function start() {
 
   app.use("/games", createRouteGame(settings));
   app.use("/playlists", createRoutePlaylists(settings));
+  app.use("/settings", createRouteSettings(settings));
   app.use("/", createRouteIndex(settings));
 
   // catch 404 and forward to error handler
