@@ -78,7 +78,7 @@ describe("routes/index", () => {
             },
         });
 
-        const response = await request(app).get("/");
+        const response = await request(app).get("/home");
 
         expect(response.status).toBe(200);
         expect(response.body.view).toBe("index");
@@ -119,7 +119,7 @@ describe("routes/index", () => {
             },
         });
 
-        const response = await request(app).get("/");
+        const response = await request(app).get("/home");
 
         expect(response.status).toBe(200);
         expect(response.body.view).toBe("index");
