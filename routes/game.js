@@ -44,6 +44,27 @@ function createRouter(settings) {
       });
   });
 
+  router.post("/:gameId/rating", function (req, res) {
+    const gameId = parseInt(req.params["gameId"], 10);
+    if (isNaN(gameId)) return res.status(400).json({ error: "Invalid input" });
+    const game = getGame(gameId, req);
+    if (!game) return res.status(404).json({ error: "Game not found" });
+
+    const rating = parseInt(req.body && req.body.rating, 10);
+    if (isNaN(rating) || rating < 0 || rating > 5) {
+      return res.status(400).json({ error: "Rating must be between 0 and 5" });
+    }
+
+    req.app.locals.runSql("UPDATE Games SET GameRating = ? WHERE GameID = ?", [rating, gameId])
+      .then(function () {
+        game.rating = rating;
+        res.json({ rating: rating });
+      })
+      .catch(function (err) {
+        res.status(500).json({ error: err.message });
+      });
+  });
+
   router.get("/:gameId/help", function (req, res) {
     getMediaFilenames(req, res, "GameHelp", ["png", "jpg"]);
   });

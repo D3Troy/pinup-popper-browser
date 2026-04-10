@@ -56,6 +56,11 @@ block content
             h4
               span.badge.bg-info.text-dark Last Played 
                 span.badge.bg-light.text-dark #{game.lastPlayed ? game.lastPlayed.toLocaleString() : 'Never'}                        
+            h4
+              span.badge.bg-secondary.me-2 Rating
+              span.rating-wrap(data-gameid=game.id, data-rating=game.rating)
+                each n in [1,2,3,4,5]
+                  i.bi.rating-star(class=(game.rating >= n ? 'bi-star-fill' : 'bi-star'), data-value=n)
             hr
             div.row
               div.col

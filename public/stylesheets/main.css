@@ -74,6 +74,24 @@ body {
   pointer-events: none;
 }
 
+.rating-wrap {
+  display: inline-flex;
+  gap: 0.15em;
+  font-size: 1rem;
+  cursor: pointer;
+  color: gold;
+  vertical-align: middle;
+}
+
+.rating-star {
+  transition: transform 0.1s;
+}
+
+.rating-star.preview {
+  color: goldenrod;
+  transform: scale(1.2);
+}
+
 .dropdown-menu {
   max-height: 90vh;
   overflow-y: auto;

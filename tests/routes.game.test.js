@@ -5,11 +5,13 @@ const request = require("supertest");
 
 function createGameApp(router, locals) {
     const app = express();
+    app.use(express.urlencoded({ extended: false }));
 
     app.locals.games = locals.games;
     app.locals.gameIds = locals.gameIds;
     app.locals.globalSettings = locals.globalSettings;
     app.locals.queryRow = locals.queryRow;
+    app.locals.runSql = locals.runSql;
     app.locals.getMediaPath = locals.getMediaPath;
 
     app.use((req, res, next) => {
@@ -46,6 +48,7 @@ function baseLocals() {
             currentGameRefreshTimer: 45000,
         },
         queryRow: jest.fn(),
+        runSql: jest.fn().mockResolvedValue(),
         getMediaPath: (inputGame) => `/media/${inputGame.emulator.id}`,
     };
 }
@@ -256,5 +259,69 @@ describe("routes/game", () => {
         ]);
 
         expect(globSync).toHaveBeenCalledTimes(2);
+    });
+
+    test("POST /games/:id/rating sets rating and returns new value", async () => {
+        const locals = baseLocals();
+        locals.games[0].rating = 0;
+
+        const createRouter = require("../routes/game");
+        const router = createRouter(settings);
+        const app = createGameApp(router, locals);
+
+        const response = await request(app)
+            .post("/games/1/rating")
+            .type("form")
+            .send({ rating: "4" });
+
+        expect(response.status).toBe(200);
+        expect(response.body.rating).toBe(4);
+        expect(locals.games[0].rating).toBe(4);
+        expect(locals.runSql).toHaveBeenCalledWith(
+            "UPDATE Games SET GameRating = ? WHERE GameID = ?",
+            [4, 1]
+        );
+    });
+
+    test("POST /games/:id/rating returns 400 for invalid rating", async () => {
+        const createRouter = require("../routes/game");
+        const router = createRouter(settings);
+        const app = createGameApp(router, baseLocals());
+
+        const tooHigh = await request(app).post("/games/1/rating").type("form").send({ rating: "6" });
+        const negative = await request(app).post("/games/1/rating").type("form").send({ rating: "-1" });
+        const notNum = await request(app).post("/games/1/rating").type("form").send({ rating: "abc" });
+
+        expect(tooHigh.status).toBe(400);
+        expect(negative.status).toBe(400);
+        expect(notNum.status).toBe(400);
+    });
+
+    test("POST /games/:id/rating returns 404 for unknown game", async () => {
+        const createRouter = require("../routes/game");
+        const router = createRouter(settings);
+        const app = createGameApp(router, baseLocals());
+
+        const response = await request(app).post("/games/999/rating").type("form").send({ rating: "3" });
+
+        expect(response.status).toBe(404);
+    });
+
+    test("POST /games/:id/rating allows clearing rating with 0", async () => {
+        const locals = baseLocals();
+        locals.games[0].rating = 3;
+
+        const createRouter = require("../routes/game");
+        const router = createRouter(settings);
+        const app = createGameApp(router, locals);
+
+        const response = await request(app)
+            .post("/games/1/rating")
+            .type("form")
+            .send({ rating: "0" });
+
+        expect(response.status).toBe(200);
+        expect(response.body.rating).toBe(0);
+        expect(locals.games[0].rating).toBe(0);
     });
 });

@@ -42,6 +42,63 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(function (err) { console.error("fav toggle failed", err); });
   });
 
+  document.addEventListener("click", function (e) {
+    var star = e.target.closest(".rating-star");
+    if (!star) return;
+    var wrap = star.closest(".rating-wrap[data-gameid]");
+    if (!wrap) return;
+    e.preventDefault();
+    var gameId = wrap.dataset.gameid;
+    var newRating = parseInt(star.dataset.value, 10);
+    var currentRating = parseInt(wrap.dataset.rating, 10);
+    if (newRating === currentRating) newRating = 0;
+    fetch("/games/" + gameId + "/rating", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "rating=" + newRating,
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        wrap.dataset.rating = data.rating;
+        wrap.querySelectorAll(".rating-star").forEach(function (s) {
+          var val = parseInt(s.dataset.value, 10);
+          s.classList.toggle("bi-star-fill", val <= data.rating);
+          s.classList.toggle("bi-star", val > data.rating);
+        });
+      })
+      .catch(function (err) { console.error("rating failed", err); });
+  });
+
+  document.addEventListener("pointerover", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var star = e.target.closest(".rating-star");
+    if (!star) return;
+    var wrap = star.closest(".rating-wrap");
+    if (!wrap) return;
+    var hovered = parseInt(star.dataset.value, 10);
+    wrap.querySelectorAll(".rating-star").forEach(function (s) {
+      var val = parseInt(s.dataset.value, 10);
+      s.classList.toggle("preview", val <= hovered);
+      s.classList.toggle("bi-star-fill", val <= hovered);
+      s.classList.toggle("bi-star", val > hovered);
+    });
+  });
+
+  document.addEventListener("pointerout", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var star = e.target.closest(".rating-star");
+    if (!star) return;
+    var wrap = star.closest(".rating-wrap");
+    if (!wrap || wrap.contains(e.relatedTarget)) return;
+    var current = parseInt(wrap.dataset.rating, 10);
+    wrap.querySelectorAll(".rating-star").forEach(function (s) {
+      var val = parseInt(s.dataset.value, 10);
+      s.classList.remove("preview");
+      s.classList.toggle("bi-star-fill", val <= current);
+      s.classList.toggle("bi-star", val > current);
+    });
+  });
+
   var htmlEl = document.documentElement;
   var toggleBtn = document.createElement("button");
   toggleBtn.id = "darkModeToggle";
