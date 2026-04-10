@@ -4,9 +4,10 @@ block content
   nav.navbar.navbar-expand-lg.fixed-top.px-3.bg-body-tertiary(data-bs-theme="dark")
     button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
-    div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
-      a(href=homeUrl, title="Home")
-        i.bi.bi-house-fill.fs-3
+    if showHome
+      div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
+        a(href=homeUrl, title="Home")
+          i.bi.bi-house-fill.fs-4
     div.collapse.navbar-collapse(id='navbarNav')
       ul.navbar-nav.nav.me-auto
         li.nav-item

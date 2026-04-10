@@ -118,6 +118,7 @@ function createRouter(settings) {
             return res.render("playlists", {
                 items: items,
                 homeUrl: homeUrl,
+                showHome: true,
             });
         }
 
@@ -160,6 +161,7 @@ function createRouter(settings) {
         res.render("playlists", {
             items: items,
             homeUrl: homeUrl,
+            showHome: true,
             error: error,
         });
     });
