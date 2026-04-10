@@ -42,13 +42,20 @@ body {
   max-height: 900px;
 }
 
+.wheel-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  container-type: inline-size;
+}
+
 .favorite {
   position: absolute;
-  top: 8%;
-  right: 8%;
-  font-size: 1.4rem;
+  top: 9%;
+  right: 14%;
+  font-size: 12cqw;
   color: gold;
-  text-shadow: 0 0 4px rgba(0,0,0,0.6);
+  text-shadow: 0 0 6px rgba(0,0,0,0.8);
 }
 
 .tooltip {
@@ -80,4 +87,184 @@ body {
 
 .game {
   position: relative;
+}
+
+/* Media overview tab */
+.media-two-col {
+  display: flex;
+  gap: 0.5rem;
+  height: calc(100vh - 70px - 1rem - 1px - 1rem);
+  overflow: hidden;
+  padding-bottom: 1rem;
+}
+
+.media-left-col {
+  flex: 0 0 40%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.media-right-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+#mediaStack {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 4px;
+}
+
+#mediaStack > .media-ov-block         { flex: 1;   min-height: 0; }
+#mediaStack > .media-ov-block--half   { flex: 0.5; min-height: 0; }
+#mediaStack > .media-ov-block--topper { flex: 0.4; min-height: 0; }
+
+.media-ov-row {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.media-ov-row > .media-ov-slot,
+.media-ov-row > .media-ov-slot-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.media-ov-block {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.media-ov-block.media-ov-row {
+  flex-direction: row;
+}
+
+.media-ov-slot {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#mediaStack .media-ov-slot       { justify-content: center; }
+#mediaInfo.media-ov-slot         { justify-content: flex-end; }
+#mediaHelp.media-ov-slot         { justify-content: flex-start; }
+
+#mediaStack .media-ov-media,
+.media-ov-row .media-ov-media {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+#mediaPlayfield {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#mediaPlayfield .media-ov-media {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (orientation: landscape) {
+  #mediaPlayfield .media-ov-media {
+    width: calc(100vh - 70px - 1rem - 1px);
+    height: auto;
+    max-width: none;
+    max-height: none;
+    transform: rotate(90deg);
+    transform-origin: center center;
+  }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  #mediaPlayfield .media-ov-media {
+    width: 133vw;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    transform: rotate(90deg);
+    transform-origin: center center;
+  }
+}
+
+.media-ov-slot-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.media-ov-slot-wrap > .media-ov-slot { position: absolute; inset: 0; }
+.media-ov-row > .media-ov-slot-wrap  { flex: 1; min-width: 0; }
+
+.media-ov-media { cursor: zoom-in; }
+
+.media-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+.media-fullscreen-overlay img,
+.media-fullscreen-overlay video {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  .media-two-col {
+    flex-direction: column;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .media-left-col { flex: none; width: 100%; }
+
+  #mediaStack {
+    height: auto;
+    flex-direction: column;
+  }
+
+  #mediaStack > .media-ov-block        { flex: none; height: 25vw; }
+  #mediaStack > .media-ov-block--topper { flex: none; height: 14vw; }
+  #mediaStack > .media-ov-block--half  { flex: none; height: 14vw; }
+
+  .media-right-col { flex: none; width: 100%; }
+
+  #mediaPlayfield {
+    width: 100%;
+    height: 100%;
+  }
 }

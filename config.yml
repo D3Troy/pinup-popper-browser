@@ -23,8 +23,24 @@ options:
     info: true
     help: true
     playfield: true
+    highscore: true
+    media:
+      topper: false
+      backglass: false
+      dmd: false
+      playfield: true
+      help: false
+      info: false
 
 media:
   useThumbs: true
   cacheInMinutes: 20
   playfieldRotation: true
+  folders:
+    topper: Topper
+    backglass: BackGlass
+    dmd: Menu
+    playfield: Playfield
+    help: GameHelp
+    info: GameInfo
+    highscore: Other2

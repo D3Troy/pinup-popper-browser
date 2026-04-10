@@ -49,6 +49,24 @@ document.addEventListener("DOMContentLoaded", function () {
         target = "help";
       } else if (e.target.textContent.trim() === "Playfield") {
         target = "playfield";
+      } else if (e.target.textContent.trim() === "Highscore") {
+        target = "highscore";
+      } else if (e.target.textContent.trim() === "Media") {
+        var mediaPaneEl = document.getElementById("media");
+        if (mediaPaneEl && mediaPaneEl.dataset.loaded) return;
+        fetch(gameEl.dataset.gameid + "/media")
+          .then(function (r) { return r.status === 200 ? r.json() : {}; })
+          .then(function (data) {
+            if (document.getElementById("mediaTopper"))    renderMediaSlot("#mediaTopper",    data.topper    || []);
+            if (document.getElementById("mediaBackglass")) renderMediaSlot("#mediaBackglass", data.backglass || []);
+            if (document.getElementById("mediaDMD"))       renderMediaSlot("#mediaDMD",       data.dmd       || []);
+            if (document.getElementById("mediaPlayfield")) renderMediaSlot("#mediaPlayfield", data.playfield || []);
+            if (document.getElementById("mediaHelp"))      renderMediaSlot("#mediaHelp",      data.help      || []);
+            if (document.getElementById("mediaInfo"))      renderMediaSlot("#mediaInfo",      data.info      || []);
+            if (mediaPaneEl) mediaPaneEl.dataset.loaded = "1";
+          })
+          .catch(function (err) { console.log(err); });
+        return;
       }
 
       if (target) {
@@ -123,6 +141,52 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
       }
+    });
+  });
+
+  function renderMediaSlot(selector, files) {
+    var slot = document.querySelector(selector);
+    if (!slot) return;
+    var src = files.length ? files[0] : "/images/unavailable.png";
+    var elem;
+    if (src.endsWith(".mp4")) {
+      elem = document.createElement("video");
+      elem.src = src;
+      elem.className = "media-ov-media";
+      elem.setAttribute("playsinline", "");
+      elem.autoplay = true;
+      elem.loop = true;
+      elem.muted = true;
+    } else {
+      elem = document.createElement("img");
+      elem.src = src;
+      elem.className = "media-ov-media";
+    }
+    slot.appendChild(elem);
+  }
+
+  document.addEventListener("click", function (e) {
+    var media = e.target.closest(".media-ov-media");
+    if (!media) return;
+    var overlay = document.createElement("div");
+    overlay.className = "media-fullscreen-overlay";
+    var clone;
+    if (media.tagName === "VIDEO") {
+      clone = document.createElement("video");
+      clone.src = media.src;
+      clone.setAttribute("playsinline", "");
+      clone.autoplay = true;
+      clone.loop = true;
+      clone.muted = media.muted;
+    } else {
+      clone = document.createElement("img");
+      clone.src = media.src;
+    }
+    overlay.appendChild(clone);
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", function () { overlay.remove(); });
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key === "Escape") { overlay.remove(); document.removeEventListener("keydown", onKey); }
     });
   });
 

@@ -26,12 +26,13 @@ block content
     div#playlistsRow.row.g-0
       each item in items
         div.col-6.col-md-4.col-lg-3.col-xl-2.my-auto.game
-          a(href=item.link, title=item.display, data-bs-toggle='tooltip', data-go-back=item.goBack ? 'true' : null)
-            img.wheel.img-fluid.lazyload(
-              class=item.cssClass,
-              src=item.placeholder,
-              data-src=item.src,
-              alt=item.display
-            )
-          if item.favorite
-            i.bi.bi-star-fill.favorite(title='Favorite')
+          div.wheel-wrap
+            a(href=item.link, title=item.display, data-bs-toggle='tooltip', data-go-back=item.goBack ? 'true' : null)
+              img.wheel.img-fluid.lazyload(
+                class=item.cssClass,
+                src=item.placeholder,
+                data-src=item.src,
+                alt=item.display
+              )
+            if item.favorite
+              i.bi.bi-star-fill.favorite(title='Favorite')

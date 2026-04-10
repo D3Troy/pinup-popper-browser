@@ -35,6 +35,26 @@ function createRouter(settings) {
     getMediaFilenames(req, res, "Playfield", ["png", "jpg", "mp4"]);
   });
 
+  router.get("/:gameId/highscore", function (req, res) {
+    const folder = (settings.media && settings.media.folders && settings.media.folders.highscore) || "Other4";
+    getMediaFilenames(req, res, folder, ["png", "jpg"]);
+  });
+
+  router.get("/:gameId/media", function (req, res) {
+    const game = getGame(req.params["gameId"], req);
+    if (!game) { res.status(404).send({}); return; }
+    const slots = settings.options.game.media && typeof settings.options.game.media === "object"
+      ? settings.options.game.media
+      : { topper: true, backglass: true, dmd: true, playfield: true, help: true, info: true };
+    const result = {};
+    for (const type of MEDIA_OVERVIEW_TYPES) {
+      if (slots[type.key]) {
+        result[type.key] = resolveMediaFiles(game, req, type.dir, type.ext);
+      }
+    }
+    res.send(result);
+  });
+
   router.get("/:gameId/launch", async function (req, res) {
     let gameId = req.params["gameId"];
     try {
@@ -126,13 +146,19 @@ function createRouter(settings) {
     let game = getGame(gameId, req);
     if (game) {
       const playlistId = req.query.playlist || null;
+      const homeUrl = playlistId ? "/playlists" : "/home";
 
       res.render("game", {
         game: game,
         info: settings.options.game.info,
         help: settings.options.game.help,
         playfield: settings.options.game.playfield,
+        media: settings.options.game.media && typeof settings.options.game.media === "object"
+          ? settings.options.game.media
+          : (settings.options.game.media ? { topper: true, backglass: true, dmd: true, playfield: true, help: true, info: true } : false),
+        highscore: settings.options.game.highscore,
         playlistId: playlistId,
+        homeUrl: homeUrl,
         wheelRotation: settings.media.useThumbs
           ? req.app.locals.globalSettings.thumbRotation
           : 0,
@@ -148,9 +174,7 @@ function createRouter(settings) {
     return text.replace(/[*?[\]{}()!@+^]/g, (c) => `[${c}]`);
   }
 
-  function getMediaFilenames(req, res, mediaDir, extensions) {
-    const game = getGame(req.params["gameId"], req);
-    if (!game) { res.send([]); return; }
+  function resolveMediaFiles(game, req, mediaDir, extensions) {
     const patterns = extensions.map(
       (ext) => escapeGlob(game.name) + "*." + ext
     );
@@ -170,8 +194,24 @@ function createRouter(settings) {
         )
       );
     }
-    res.send(result);
+    return result;
   }
+
+  function getMediaFilenames(req, res, mediaDir, extensions) {
+    const game = getGame(req.params["gameId"], req);
+    if (!game) { res.send([]); return; }
+    res.send(resolveMediaFiles(game, req, mediaDir, extensions));
+  }
+
+  const folderMap = (settings.media && settings.media.folders) || {};
+  const MEDIA_OVERVIEW_TYPES = [
+    { key: "topper",    dir: folderMap.topper    || "Topper",    ext: ["png", "jpg", "mp4"] },
+    { key: "backglass", dir: folderMap.backglass  || "BackGlass", ext: ["png", "jpg", "mp4"] },
+    { key: "dmd",       dir: folderMap.dmd        || "Menu",      ext: ["png", "jpg", "mp4"] },
+    { key: "playfield", dir: folderMap.playfield  || "Playfield", ext: ["png", "jpg", "mp4"] },
+    { key: "help",      dir: folderMap.help       || "GameHelp",  ext: ["png", "jpg"] },
+    { key: "info",      dir: folderMap.info       || "GameInfo",  ext: ["png", "jpg"] },
+  ];
 
   return router;
 }

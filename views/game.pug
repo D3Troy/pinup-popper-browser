@@ -5,7 +5,7 @@ block content
     button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
-      a(href="/home", title="Home")
+      a(href=homeUrl, title="Home")
         i.bi.bi-house-fill.fs-4
     #navbarNav.collapse.navbar-collapse
       ul#tabs.navbar-nav.nav
@@ -20,15 +20,22 @@ block content
         if (playfield)
           li.nav-item
             a.nav-link(href='#playfield', data-bs-toggle='tab', data-gameid=game.id) Playfield
+        if (media)
+          li.nav-item
+            a.nav-link(href='#media', data-bs-toggle='tab') Media
+        if (highscore)
+          li.nav-item
+            a.nav-link(href='#highscore', data-bs-toggle='tab', data-gameid=game.id) Highscore
 
   #game.container-fluid(data-gameid=game.id, data-refresh=refreshInterval)
     div.tab-content
       #home.tab-pane.fade
         div.row
           div.col-sm-5.col-md-4.col-xl-3.mb-3
-            img.wheel.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
-            if game.favorite
-              i.bi.bi-star-fill.favorite(title="Favorite")
+            div.wheel-wrap
+              img.wheel.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
+              if game.favorite
+                i.bi.bi-star-fill.favorite(title="Favorite")
           div.col
             h4.text-nowrap
               span.badge.bg-primary Year 
@@ -80,5 +87,48 @@ block content
             span.carousel-control-next-icon(aria-hidden='true')
             span.visually-hidden Next
       #playfield.tab-pane.fade(data-rotate=playfieldRotation)
+
+      if media
+        - const hasLeftMedia = !!(media.topper || media.backglass || media.dmd || media.info || media.help)
+        #media.tab-pane.fade
+          .media-two-col
+            if hasLeftMedia
+              .media-left-col
+                #mediaStack
+                  if (media && media.topper)
+                    .media-ov-block.media-ov-block--topper
+                      .media-ov-slot-wrap
+                        #mediaTopper.media-ov-slot
+                  if (media && media.backglass)
+                    .media-ov-block
+                      .media-ov-slot-wrap
+                        #mediaBackglass.media-ov-slot
+                  if (media && media.dmd)
+                    .media-ov-block
+                      .media-ov-slot-wrap
+                        #mediaDMD.media-ov-slot
+                  if (media && (media.info || media.help))
+                    .media-ov-block.media-ov-block--half.media-ov-row
+                      if (media && media.info)
+                        .media-ov-slot-wrap
+                          #mediaInfo.media-ov-slot
+                      if (media && media.help)
+                        .media-ov-slot-wrap
+                          #mediaHelp.media-ov-slot
+            if (media && media.playfield)
+              .media-right-col
+                .media-ov-slot-wrap
+                  #mediaPlayfield.media-ov-slot
+
+      if highscore
+        #highscore.tab-pane.fade
+          #carouselHighscore.carousel.slide(data-bs-ride='carousel')
+            div.carousel-inner
+            button.carousel-control-prev(type='button', data-bs-target='#carouselHighscore', data-bs-slide='prev')
+              span.carousel-control-prev-icon(aria-hidden='true')
+              span.visually-hidden Previous
+            button.carousel-control-next(type='button', data-bs-target='#carouselHighscore', data-bs-slide='next')
+              span.carousel-control-next-icon(aria-hidden='true')
+              span.visually-hidden Next
 
 

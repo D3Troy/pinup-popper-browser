@@ -57,7 +57,7 @@ function createRouter(settings) {
                 httpOnly: true,
                 sameSite: "lax",
             });
-            return res.redirect("/playlists/" + id);
+            return res.send('<script>location.replace("/playlists/' + id + '")</script>');
         }
 
         return res.render("playlist_lock", {

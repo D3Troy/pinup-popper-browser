@@ -67,7 +67,8 @@ block content
     #gamesRow.row.g-0
       each game in games
         div.col-6.col-md-4.col-lg-2.my-auto.game(data-category=game.category, data-theme=game.theme, data-type=game.type, data-decade=game.decade, data-manufact=game.manufacturer, data-emulator=game.emulator.name, data-fav=game.favorite)
-          a(href='/games/'+game.id, title=game.display, data-bs-toggle='tooltip')
-            img.wheel.img-fluid.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
-          if game.favorite
-            i.bi.bi-star-fill.favorite(title="Favorite")
+          div.wheel-wrap
+            a(href='/games/'+game.id, title=game.display, data-bs-toggle='tooltip')
+              img.wheel.img-fluid.lazyload(class='rotate'+wheelRotation, src='/images/wheel_loading_'+wheelRotation+'.gif', data-src=getWheelSrc(game))
+            if game.favorite
+              i.bi.bi-star-fill.favorite(title="Favorite")
