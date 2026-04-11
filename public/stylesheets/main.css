@@ -747,7 +747,7 @@ body {
   justify-content: center;
 }
 
-#mediaStack .media-ov-slot       { justify-content: center; }
+#mediaStack .media-ov-slot       { justify-content: center; align-items: flex-start; }
 #mediaInfo.media-ov-slot         { justify-content: flex-end; }
 #mediaHelp.media-ov-slot         { justify-content: flex-start; }
 
@@ -779,7 +779,7 @@ body {
   display: block;
 }
 
-@media (orientation: landscape) {
+@media (min-width: 768px) {
   #mediaPlayfield .media-ov-media {
     width: calc(100vh - 70px - 1rem - 1px);
     height: auto;
@@ -790,13 +790,20 @@ body {
   }
 }
 
-@media (max-width: 767px) and (orientation: portrait) {
+@media (min-width: 768px) and (orientation: portrait) {
   #mediaPlayfield .media-ov-media {
-    width: 133vw;
+    width: min(177.78%, calc(100vh - 70px - 1rem - 1px));
+  }
+}
+
+@media (max-width: 767px) {
+  #mediaPlayfield .media-ov-media {
+    width: 56.25%;
     height: auto;
     max-width: none;
     max-height: none;
-    transform: rotate(90deg);
+    object-fit: contain;
+    transform: rotate(90deg) !important;
     transform-origin: center center;
   }
 }
@@ -830,31 +837,107 @@ body {
   max-height: 100%;
 }
 
-@media (max-width: 767px) and (orientation: portrait) {
+@media (max-width: 767px) {
   .media-two-col {
     flex-direction: column;
     height: auto;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: visible;
     padding-bottom: 0.5rem;
   }
 
   .media-left-col { flex: none; width: 100%; }
+
+  .media-left-col .media-ov-block,
+  .media-left-col .media-ov-slot-wrap,
+  .media-right-col .media-ov-slot-wrap,
+  .media-ov-row,
+  .media-ov-row > .media-ov-slot-wrap {
+    width: 100%;
+  }
 
   #mediaStack {
     height: auto;
     flex-direction: column;
   }
 
-  #mediaStack > .media-ov-block           { flex: none; height: 25vw; }
+  #mediaStack > .media-ov-block           { flex: none; height: auto; aspect-ratio: 16 / 9; }
   #mediaStack > .media-ov-block--topper  { flex: none; height: 14vw; }
-  #mediaStack > .media-ov-block--half    { flex: none; height: 14vw; }
+  #mediaStack > .media-ov-block--half    { flex: none; height: auto; }
   #mediaStack > .media-ov-block--dmd { flex: none; height: auto; aspect-ratio: 16 / 9; width: 100%; }
 
-  .media-right-col { flex: none; width: 100%; }
+  .media-right-col {
+    flex: none;
+    width: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .media-right-col .media-ov-slot-wrap {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 9 / 16;
+  }
+
+  #mediaStack .media-ov-media,
+  .media-ov-row .media-ov-media {
+    width: 100%;
+    height: 100%;
+  }
 
   #mediaPlayfield {
     width: 100%;
     height: 100%;
+  }
+
+  #mediaBackglass .media-ov-media,
+  #mediaFullDmd .media-ov-media {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  #mediaInfo.media-ov-slot,
+  #mediaHelp.media-ov-slot {
+    justify-content: center;
+  }
+
+  .media-ov-block--half {
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .media-ov-block--half .media-ov-slot-wrap {
+    aspect-ratio: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .media-ov-block--half .media-ov-slot-wrap > .media-ov-slot {
+    position: static;
+  }
+
+  #mediaInfo .media-ov-media,
+  #mediaHelp .media-ov-media {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .media-ov-block--half .media-ov-media {
+    height: auto;
+    max-height: none;
+    align-self: flex-start;
+  }
+
+  #mediaPlayfield .media-ov-media {
+    width: 177.78%;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    transform: rotate(90deg) !important;
+    transform-origin: center center;
   }
 }
