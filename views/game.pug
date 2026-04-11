@@ -7,6 +7,8 @@ block content
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
       a(href=homeUrl, title="Home")
         i.bi.bi-house-fill.fs-4
+      a(href='/settings', title="Settings")
+        i.bi.bi-gear-fill.fs-5
     #navbarNav.collapse.navbar-collapse
       ul#tabs.navbar-nav.nav
         li.nav-item
@@ -82,7 +84,9 @@ block content
                       else if field === 'webLinkUrl'
                         if game.webLinkUrl
                           span.game-stat-value
-                            a(href=game.webLinkUrl target="_blank") #{game.webLinkUrl}
+                            a.btn.btn-sm.btn-outline-secondary.py-0(href=game.webLinkUrl, target='_blank', rel='noopener')
+                              i.bi.bi-box-arrow-up-right.me-1
+                              | Visit
                         else
                           span.game-stat-value —
                       else if field === 'emulator'

@@ -93,9 +93,16 @@ function createRouter(settings) {
       },
     };
     settings.options.gameFields    = gameFields;
-    settings.media.useThumbs       = b["media.useThumbs"]        === "on";
-    settings.media.playfieldRotation = b["media.playfieldRotation"] === "on";
-    settings.media.cacheInMinutes  = parseInt(b["media.cacheInMinutes"], 10) || settings.media.cacheInMinutes;
+    settings.media.useThumbs         = b["media.useThumbs"]          === "on";
+    settings.media.playfieldRotation = b["media.playfieldRotation"]  === "on";
+    settings.media.cacheInMinutes    = parseInt(b["media.cacheInMinutes"], 10) || settings.media.cacheInMinutes;
+
+    const folderSlots = ["topper", "backglass", "dmd", "playfield", "help", "info", "highscore"];
+    if (!settings.media.folders) settings.media.folders = {};
+    folderSlots.forEach(function (slot) {
+      const val = (b["media.folders." + slot] || "").trim();
+      if (val) settings.media.folders[slot] = val;
+    });
 
     req.app.locals.gameFields = gameFields;
     req.app.locals.dateFormat = settings.options.dateFormat;

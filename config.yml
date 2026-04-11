@@ -58,7 +58,7 @@ media:
     topper: Topper
     backglass: BackGlass
     dmd: Menu
-    playfield: Playfield
+    playfield: PlayField
     help: GameHelp
     info: GameInfo
     highscore: Other2

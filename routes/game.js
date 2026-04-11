@@ -23,8 +23,10 @@ function createRouter(settings) {
     return response.json();
   }
 
+  const folderMap = (settings.media && settings.media.folders) || {};
+
   router.get("/:gameId/info", function (req, res) {
-    getMediaFilenames(req, res, "GameInfo", ["png", "jpg"]);
+    getMediaFilenames(req, res, folderMap.info || "GameInfo", ["png", "jpg"]);
   });
 
   router.post("/:gameId/fav", function (req, res) {
@@ -66,16 +68,15 @@ function createRouter(settings) {
   });
 
   router.get("/:gameId/help", function (req, res) {
-    getMediaFilenames(req, res, "GameHelp", ["png", "jpg"]);
+    getMediaFilenames(req, res, folderMap.help || "GameHelp", ["png", "jpg"]);
   });
 
   router.get("/:gameId/playfield", function (req, res) {
-    getMediaFilenames(req, res, "Playfield", ["png", "jpg", "mp4"]);
+    getMediaFilenames(req, res, folderMap.playfield || "PlayField", ["png", "jpg", "mp4"]);
   });
 
   router.get("/:gameId/highscore", function (req, res) {
-    const folder = (settings.media && settings.media.folders && settings.media.folders.highscore) || "Other4";
-    getMediaFilenames(req, res, folder, ["png", "jpg"]);
+    getMediaFilenames(req, res, folderMap.highscore || "Other2", ["png", "jpg"]);
   });
 
   router.get("/:gameId/media", function (req, res) {
@@ -284,7 +285,6 @@ function createRouter(settings) {
     res.send(resolveMediaFiles(game, req, mediaDir, extensions));
   }
 
-  const folderMap = (settings.media && settings.media.folders) || {};
   const MEDIA_OVERVIEW_TYPES = [
     { key: "topper",    dir: folderMap.topper    || "Topper",    ext: ["png", "jpg", "mp4"] },
     { key: "backglass", dir: folderMap.backglass  || "BackGlass", ext: ["png", "jpg", "mp4"] },

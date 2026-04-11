@@ -1,9 +1,15 @@
 extends layout
 
 block content
+  nav.navbar.navbar-expand-md.fixed-top.px-3.bg-body-tertiary(data-bs-theme="dark")
+    button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    span.navbar-brand.mb-0.ms-2 Settings
+    div#navbarNav.collapse.navbar-collapse
+    a(href='/settings', title='Settings')
+      i.bi.bi-gear-fill.fs-5
+
   div.settings-page
-    div.settings-header.d-flex.align-items-center.gap-3.mb-4
-      h2.mb-0 Settings
 
     form#settingsForm(method='post', action='/settings')
 
@@ -35,11 +41,6 @@ block content
                     img.view-mock-dot(src=src, onerror="this.src='/images/unavailable.png'")
               span Playlists
 
-        div.settings-row
-          div.settings-field-group
-            label.settings-label Date Format
-            p.settings-field-hint e.g. #[span#dateFormatPreview #{dateFormatExample}]
-          input.form-control.settings-input(type='text', name='dateFormat', value=cfg.options.dateFormat, placeholder='dd.MM.yyyy HH.mm')
 
       
       // Filters section for dropdowns
@@ -62,27 +63,25 @@ block content
             label.settings-check
               input(type='checkbox', name=`game.${key}`, checked=cfg.options.game && cfg.options.game[key])
               span= key.charAt(0).toUpperCase() + key.slice(1)
-        div.settings-media-block.mt-3
-          p.settings-sublabel Media Slots
-          p.settings-field-hint Which panels appear in the Media overview tab.
-          div.settings-checks
-            each slot in ['topper', 'backglass', 'dmd', 'playfield', 'help', 'info']
-              label.settings-check
-                input(type='checkbox', name=`game.media.${slot}`, checked=cfg.options.game && cfg.options.game.media && cfg.options.game.media[slot])
-                span= slot.charAt(0).toUpperCase() + slot.slice(1)
 
       
       // Game fields section with drag-and-drop and preview
       section.settings-section.settings-section--wide
-        h5.settings-section-title Game Fields
+        div.d-flex.align-items-center.justify-content-between.mb-1
+          h5.settings-section-title.mb-0 Game Fields
+          button.btn.btn-outline-secondary.btn-sm.d-md-none(type='button', data-bs-toggle='modal', data-bs-target='#previewModal') Preview
         p.settings-desc Fields shown in the game stats table. Drag to reorder, uncheck to hide. The preview mirrors the real game page.
+
+        div.settings-row.mb-3
+          div.settings-field-group
+            label.settings-label Date Format
+            p.settings-field-hint e.g. #[span#dateFormatPreview #{dateFormatExample}]
+          input.form-control.settings-input(type='text', name='dateFormat', value=cfg.options.dateFormat, placeholder='dd.MM.yyyy HH.mm')
+
         div.settings-fields-layout
-          
           // Draggable field list (left column)
           div.settings-fields-col
-            div.d-flex.align-items-center.justify-content-between.mb-2
-              p.settings-sublabel.mb-0 Drag to reorder · uncheck to hide
-              button#togglePreview.btn.btn-outline-secondary.btn-sm.d-md-none(type='button', aria-controls='fieldsPreviewMobile', aria-expanded='false') Show Preview
+            p.settings-sublabel Drag to reorder · uncheck to hide
             ul#fieldsList.settings-fields-list
               each field in gameFields
                 li.settings-field-item(draggable='true', data-field=field)
@@ -98,15 +97,13 @@ block content
                     input(type='checkbox', checked=false)
                     span= field
 
-          
-          // Live preview (right column)
-          div.settings-preview-col#fieldsPreviewMobile
+          // Live preview (right column, desktop only)
+          div.settings-preview-col.d-none.d-md-block
             p.settings-sublabel
               | Live preview
               if previewGame
                 span.settings-preview-game-name  · #{previewGame.display}
             if previewGame
-              
               div.settings-game-preview
                 div.game-home-layout
                   div.game-wheel-col
@@ -150,10 +147,64 @@ block content
             label.settings-label Cache (minutes)
             p.settings-field-hint How long the browser caches media files. Set to 0 to disable.
           input.form-control.settings-input(type='number', name='media.cacheInMinutes', value=cfg.media.cacheInMinutes, min='0')
+        div.mt-3
+          p.settings-sublabel Media Folder Names
+          p.settings-field-hint Visible column enables the panel in the Media tab. Folder sets which subfolder to read from.
+          - const folderSlots = ['topper','backglass','dmd','playfield','help','info','highscore']
+          - const folderDefaults = {topper:'Topper',backglass:'BackGlass',dmd:'Menu',playfield:'PlayField',help:'GameHelp',info:'GameInfo',highscore:'Other2'}
+          - const folderOptions = ['BackGlass','GameHelp','GameInfo','Menu','Other1','Other2','PlayField','Topper']
+          - const mediaSlots = ['topper','backglass','dmd','playfield','help','info']
+          table.settings-folder-table
+            thead
+              tr
+                th Visible
+                th Slot
+                th Folder
+            tbody
+              each slot in folderSlots
+                - const current = (cfg.media.folders && cfg.media.folders[slot]) || folderDefaults[slot]
+                - const hasVisibility = mediaSlots.indexOf(slot) !== -1
+                - const isVisible = cfg.options.game && cfg.options.game.media && cfg.options.game.media[slot]
+                tr
+                  td.settings-folder-check
+                    if hasVisibility
+                      input(type='checkbox', name=`game.media.${slot}`, checked=isVisible)
+                  td.settings-folder-label= slot.charAt(0).toUpperCase() + slot.slice(1)
+                  td
+                    select.form-select.form-select-sm(name=`media.folders.${slot}`)
+                      each opt in folderOptions
+                        option(value=opt, selected=opt === current) #{opt}
 
       div.settings-footer
         a.btn.btn-secondary(href='/') Cancel
         button.btn.btn-primary.px-4(type='submit') Save Settings
+
+    //- Preview modal (mobile) — Bootstrap modal containing the full game preview
+    if previewGame
+      div#previewModal.modal.fade(tabindex='-1', aria-labelledby='previewModalLabel', aria-hidden='true')
+        div.modal-dialog.modal-dialog-scrollable.modal-lg
+          div.modal-content
+            div.modal-header.py-2
+              span.modal-title.settings-sublabel#previewModalLabel
+                | Preview · #{previewGame.display}
+              button.btn-close(type='button', data-bs-dismiss='modal', aria-label='Close')
+            div.modal-body.p-0
+              div.settings-game-preview
+                div.game-home-layout
+                  div.game-wheel-col
+                    div.wheel-wrap
+                      img.wheel(class='rotate'+wheelRotation, src=wheelSrc, onerror="this.src='/images/unavailable.png'")
+                  div.game-right-col
+                    div.game-info-card
+                      div.game-stats#fieldsPreviewModal
+                    div.game-actions
+                      div.d-flex.align-items-center.gap-2
+                        button.btn.btn-secondary(type='button', disabled)
+                          i.bi.bi-arrow-left-circle
+                          span.btn-label-back.ms-1 Go Back
+                        div.ms-auto.d-flex.align-items-center.gap-2
+                          button.btn.btn-warning(type='button', disabled) Exit Current Game
+                          button.btn.btn-primary.px-4(type='button', disabled) Launch Game
 
   // Settings page scripts for preview, drag-and-drop, and form logic
   script.
@@ -221,22 +272,26 @@ block content
     
     // Rebuilds the preview stats table from the current field list state
     function renderPreview() {
-      var preview = document.getElementById('fieldsPreview');
-      if (!preview || !PREVIEW_GAME) return;
+      if (!PREVIEW_GAME) return;
       var items = Array.from(document.querySelectorAll('#fieldsList .settings-field-item'));
-      preview.innerHTML = '';
+      var targets = ['fieldsPreview', 'fieldsPreviewModal'].map(function(id) {
+        return document.getElementById(id);
+      }).filter(Boolean);
+      targets.forEach(function(preview) { preview.innerHTML = ''; });
       items.forEach(function (li) {
         if (!li.querySelector('input[type=checkbox]').checked) return;
         var field = li.dataset.field;
         var meta  = FIELD_META[field];
         if (!meta) return;
-        var row = document.createElement('div');
-        row.className = 'game-stat';
-        row.innerHTML =
-          '<i class="bi bi-' + meta.icon + ' game-stat-icon"></i>' +
-          '<span class="game-stat-label">' + meta.label + '</span>' +
-          '<span class="game-stat-value">' + fieldValueHtml(field, PREVIEW_GAME) + '</span>';
-        preview.appendChild(row);
+        targets.forEach(function(preview) {
+          var row = document.createElement('div');
+          row.className = 'game-stat';
+          row.innerHTML =
+            '<i class="bi bi-' + meta.icon + ' game-stat-icon"></i>' +
+            '<span class="game-stat-label">' + meta.label + '</span>' +
+            '<span class="game-stat-value">' + fieldValueHtml(field, PREVIEW_GAME) + '</span>';
+          preview.appendChild(row);
+        });
       });
     }
 
@@ -388,4 +443,12 @@ block content
         }
       }
       dateInput.addEventListener('input', refreshDatePreview);
+
+      // Re-render preview each time the modal opens so it reflects current field state
+      var previewModal = document.getElementById('previewModal');
+      if (previewModal) {
+        previewModal.addEventListener('show.bs.modal', function () {
+          renderPreview();
+        });
+      }
     });
