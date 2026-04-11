@@ -23,8 +23,8 @@ Credit goes to the original creator, [doogie2301](https://github.com/doogie2301)
   ![main](docs/images/light-mode.png)
 
   - **Game Select** - Jumps to the Game View for a specific game
-    - **Current Game\*** - The game currently in view in the Pinup Popper menu or the game currently being played.
-    - **Last Played\*** - The game that was last played
+    - **Current Game\** - The game currently in view in the Pinup Popper menu or the game currently being played.
+    - **Last Played\** - The game that was last played
     - **Random Game** - A randomly selected game
   - **Filters** - The game list can be filtered by one of the following fields: Category, Theme, Type, Decade, Emulator, Manufacturer, and Favorites.
   - **Search Box** - Filters the games by name containing the entered text
