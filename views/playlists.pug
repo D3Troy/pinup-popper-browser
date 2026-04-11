@@ -5,23 +5,21 @@ block content
     button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
-      // Always show search on navigation pages; mobile uses icon toggle
       div.d-flex.align-items-center.text-nowrap.me-2
         span.navbar-text.me-1 Count:
         span#gameCount.navbar-text(data-total=items.length) #{items.length}
         a#clearFilter.ms-1(href="#", title="Clear filter", style="display:none")
           i.bi.bi-x-circle.fs-4
-      button#mobileSearchToggle.btn.btn-link.p-0.text-secondary.d-lg-none(type='button', aria-label='Search')
+      button#mobileSearchToggle.btn.btn-link.p-0.text-secondary.d-lg-none.navbar-icon(type='button', aria-label='Search')
         i.bi.bi-search.fs-5
       form#searchForm.d-none.d-lg-flex.mt-1.mt-lg-0.me-2.search-input-wrapper
         input#gameSearch.form-control(type='search', placeholder='Search', aria-label='Search')
       if showHome
-        a(href=homeUrl, title="Home")
+        a.navbar-icon(href=homeUrl, title="Home")
           i.bi.bi-house-fill.fs-4
       if !kioskMode
-        a(href='/settings', title="Settings")
+        a.navbar-icon(href='/settings', title="Settings")
           i.bi.bi-gear-fill.fs-4
-      // Mode toggle will be injected by JS as last
     div.collapse.navbar-collapse(id='navbarNav')
       ul.navbar-nav.nav.me-auto
         li.nav-item

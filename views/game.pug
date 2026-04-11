@@ -6,10 +6,10 @@ block content
       span.navbar-toggler-icon
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
       // No search bar on this page
-      a(href=homeUrl, title="Home")
+      a.navbar-icon(href=homeUrl, title="Home")
         i.bi.bi-house-fill.fs-4
       if !kioskMode
-        a(href='/settings', title="Settings")
+        a.navbar-icon(href='/settings', title="Settings")
           i.bi.bi-gear-fill.fs-4
       // Mode toggle will be injected by JS as last
     #navbarNav.collapse.navbar-collapse
@@ -98,14 +98,12 @@ block content
                         - const val = game[field]
                         span.game-stat-value #{(val !== undefined && val !== null && val !== '') ? val : '—'}
             div.game-actions
-              #response.mb-2
-              div.d-flex.align-items-center.gap-2
+              div.btn-group.game-action-group(role="group", aria-label="Game actions")
                 button#btnBack.btn.btn-secondary(type='button', data-back-url=playlistId ? '/playlists/' + playlistId : null)
                   i.bi.bi-arrow-left-circle
                   span.btn-label-back.ms-1 Go Back
-                div.ms-auto.d-flex.align-items-center.gap-2
-                  button#btnExit.btn.btn-warning(type='button', data-id=game.id) Exit Current Game
-                  button#btnLaunch.btn.btn-primary.px-4(type='button', data-id=game.id) Launch Game
+                button#btnExit.btn.btn-warning(type='button', data-id=game.id) Exit Current Game
+                button#btnLaunch.btn.btn-primary(type='button', data-id=game.id) Launch Game
 
       if media
         - const hasLeftMedia = !!(media.topper || media.backglass || media.fulldmd || media.dmd || media.info || media.help)

@@ -137,21 +137,28 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   var htmlEl = document.documentElement;
-  var toggleBtn = document.createElement("button");
-  toggleBtn.id = "darkModeToggle";
-  toggleBtn.type = "button";
-  toggleBtn.className = "btn btn-mode-toggle";
-  toggleBtn.setAttribute("aria-label", "Toggle dark mode");
-  toggleBtn.innerHTML = htmlEl.getAttribute("data-bs-theme") === "dark" ? '<i class="bi bi-sun-fill fs-4"></i>' : '<i class="bi bi-moon-stars-fill fs-4"></i>';
-  toggleBtn.addEventListener("click", function () {
-    var next = htmlEl.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
-    htmlEl.setAttribute("data-bs-theme", next);
-    localStorage.setItem("theme", next);
-    this.innerHTML = next === "dark" ? '<i class="bi bi-sun-fill fs-4"></i>' : '<i class="bi bi-moon-stars-fill fs-4"></i>';
-  });
+  var themeToggle = document.createElement("button");
+  themeToggle.className = "btn btn-mode-toggle navbar-icon";
+  themeToggle.type = "button";
+  themeToggle.id = "themeToggle";
+
+  function syncThemeToggle() {
+    var isDark = htmlEl.getAttribute("data-bs-theme") === "dark";
+    themeToggle.innerHTML = '<i class="bi ' + (isDark ? "bi-sun-fill" : "bi-moon-stars-fill") + ' fs-4"></i>';
+    themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    themeToggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+  }
+
+  syncThemeToggle();
   var navbarRight = document.getElementById("navbarRight");
   if (navbarRight) {
-    navbarRight.appendChild(toggleBtn);
+    navbarRight.appendChild(themeToggle);
+    themeToggle.addEventListener("click", function () {
+      var nextTheme = htmlEl.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+      htmlEl.setAttribute("data-bs-theme", nextTheme);
+      localStorage.setItem("theme", nextTheme);
+      syncThemeToggle();
+    });
   }
 
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {

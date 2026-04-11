@@ -114,13 +114,12 @@ block content
                     div.game-info-card
                       div.game-stats#fieldsPreview
                     div.game-actions
-                      div.d-flex.align-items-center.gap-2
+                      div.btn-group.game-action-group(role="group", aria-label="Preview game actions")
                         button.btn.btn-secondary(type='button', disabled)
                           i.bi.bi-arrow-left-circle
                           span.btn-label-back.ms-1 Go Back
-                        div.ms-auto.d-flex.align-items-center.gap-2
-                          button.btn.btn-warning(type='button', disabled) Exit Current Game
-                          button.btn.btn-primary.px-4(type='button', disabled) Launch Game
+                        button.btn.btn-warning(type='button', disabled) Exit Current Game
+                        button.btn.btn-primary(type='button', disabled) Launch Game
             else
               p.text-muted.small No games available for preview.
 
@@ -201,13 +200,12 @@ block content
                     div.game-info-card
                       div.game-stats#fieldsPreviewModal
                     div.game-actions
-                      div.d-flex.align-items-center.gap-2
+                      div.btn-group.game-action-group(role="group", aria-label="Preview game actions")
                         button.btn.btn-secondary(type='button', disabled)
                           i.bi.bi-arrow-left-circle
                           span.btn-label-back.ms-1 Go Back
-                        div.ms-auto.d-flex.align-items-center.gap-2
-                          button.btn.btn-warning(type='button', disabled) Exit Current Game
-                          button.btn.btn-primary.px-4(type='button', disabled) Launch Game
+                        button.btn.btn-warning(type='button', disabled) Exit Current Game
+                        button.btn.btn-primary(type='button', disabled) Launch Game
 
   // Settings page scripts for preview, drag-and-drop, and form logic
   script.
@@ -237,13 +235,38 @@ block content
     };
 
     
+    function currentDateFormat() {
+      var dateInput = document.querySelector('input[name="dateFormat"]');
+      return dateInput ? dateInput.value.trim() : '';
+    }
+
+    function formatLastPlayed(raw) {
+      if (!raw) return 'Never';
+      var date = new Date(raw);
+      if (isNaN(date.getTime())) return esc(raw);
+      var fmt = currentDateFormat();
+      function pad(n) { return n.toString().padStart(2, '0'); }
+      if (fmt && /[dMyHhms]/.test(fmt)) {
+        var map = {
+          dd: pad(date.getDate()),
+          MM: pad(date.getMonth() + 1),
+          yyyy: date.getFullYear(),
+          HH: pad(date.getHours()),
+          mm: pad(date.getMinutes()),
+          ss: pad(date.getSeconds()),
+        };
+        return fmt.replace(/dd|MM|yyyy|HH|mm|ss/g, function(k) { return map[k] || k; });
+      }
+      return date.toLocaleString();
+    }
+
     // Returns the display HTML for a field value, mirroring game.pug rendering
     function fieldValueHtml(field, game) {
       if (field === 'emulator') {
         return esc((game.emulator && game.emulator.name) || '—');
       }
       if (field === 'lastPlayed') {
-        return game.lastPlayed ? new Date(game.lastPlayed).toLocaleString() : 'Never';
+        return formatLastPlayed(game.lastPlayed);
       }
       if (field === 'timePlayed') {
         var t = game.timePlayed || 0;
@@ -259,6 +282,11 @@ block content
           html += '<i class="bi bi-' + (i <= r ? 'star-fill' : 'star') + ' rating-star"></i>';
         }
         return html;
+      }
+      if (field === 'webLinkUrl') {
+        if (!game.webLinkUrl) return '&mdash;';
+        return '<a class="btn btn-sm btn-outline-secondary py-0" href="' + esc(game.webLinkUrl) + '" target="_blank" rel="noopener">' +
+          '<i class="bi bi-box-arrow-up-right me-1"></i>Visit</a>';
       }
       var v = game[field];
       return esc((v !== undefined && v !== null && v !== '') ? String(v) : '—');
@@ -289,10 +317,13 @@ block content
         targets.forEach(function(preview) {
           var row = document.createElement('div');
           row.className = 'game-stat';
+          var valueHtml = field === 'rating'
+            ? '<span class="rating-wrap" data-rating="' + (parseInt(PREVIEW_GAME.rating, 10) || 0) + '">' + fieldValueHtml(field, PREVIEW_GAME) + '</span>'
+            : fieldValueHtml(field, PREVIEW_GAME);
           row.innerHTML =
             '<i class="bi bi-' + meta.icon + ' game-stat-icon"></i>' +
             '<span class="game-stat-label">' + meta.label + '</span>' +
-            '<span class="game-stat-value">' + fieldValueHtml(field, PREVIEW_GAME) + '</span>';
+            '<span class="game-stat-value">' + valueHtml + '</span>';
           preview.appendChild(row);
         });
       });

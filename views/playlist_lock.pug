@@ -5,13 +5,11 @@ block content
     button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
-      // No search bar on this page
-      a(href=homeUrl, title="Home")
+      a.navbar-icon(href=homeUrl, title="Home")
         i.bi.bi-house-fill.fs-4
       if !kioskMode
-        a(href='/settings', title="Settings")
+        a.navbar-icon(href='/settings', title="Settings")
           i.bi.bi-gear-fill.fs-4
-      // Mode toggle will be injected by JS as last
     div.collapse.navbar-collapse(id='navbarNav')
       ul.navbar-nav.nav.me-auto
         li.nav-item

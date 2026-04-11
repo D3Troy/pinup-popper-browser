@@ -54,22 +54,19 @@ block content
             a.nav-link(href="#", data-filter="fav") Favorites
         li.nav-item
           a.nav-link(href='/playlists') Playlists
-      // Removed duplicate count/clearFilter block
     div#navbarRight.d-flex.align-items-center.gap-2.ms-auto
-      // Always show search on navigation pages; mobile uses icon toggle
       div.d-flex.align-items-center.text-nowrap.me-2
         span.navbar-text.me-1 Count:
         span#gameCount.navbar-text(data-total=games.length) #{games.length}
         a#clearFilter.ms-1(href="#", title="Clear filter", style="display:none")
           i.bi.bi-x-circle.fs-4
-      button#mobileSearchToggle.btn.btn-link.p-0.text-secondary.d-lg-none(type='button', aria-label='Search')
+      button#mobileSearchToggle.btn.btn-link.p-0.text-secondary.d-lg-none.navbar-icon(type='button', aria-label='Search')
         i.bi.bi-search.fs-5
       form#searchForm.d-none.d-lg-flex.mt-1.mt-lg-0.me-2.search-input-wrapper
         input#gameSearch.form-control(type='search', placeholder='Search', aria-label='Search')
       if !kioskMode
-        a(href='/settings', title="Settings")
+        a.navbar-icon(href='/settings', title="Settings")
           i.bi.bi-gear-fill.fs-4
-      // Mode toggle will be injected by JS as last
 
   div.container-fluid
     #gamesRow.row.g-0
