@@ -10,6 +10,7 @@ httpServer:
   logLevel: error
 
 options:
+  kioskMode: false
   defaultView: playlists  # home | playlists
   filters:
     category: true
@@ -23,8 +24,44 @@ options:
     info: true
     help: true
     playfield: true
+    highscore: true
+    media:
+      topper: false
+      backglass: true
+      fulldmd: true
+      dmd: false
+      playfield: true
+      help: true
+      info: true
+  dateFormat: dd.MM.yyyy HH:mm
+
+  # Available fields: year, type, manufacturer, numPlayers, emulator,
+  #   category, theme, rating, lastPlayed, numPlays, timePlayed,
+  #   designedBy, webLinkUrl, gameVersion, gameDescription, romName, tableType
+  gameFields:
+    - year
+    - type
+    - manufacturer
+    - numPlayers
+    - emulator
+    - lastPlayed
+    - numPlays
+    - timePlayed
+    - designedBy
+    - webLinkUrl
+    - gameVersion
+    - rating
 
 media:
   useThumbs: true
   cacheInMinutes: 20
   playfieldRotation: true
+  folders:
+    topper: Topper
+    backglass: BackGlass
+    fulldmd: Menu
+    dmd: DMD
+    playfield: PlayField
+    help: GameHelp
+    info: GameInfo
+    highscore: Other2

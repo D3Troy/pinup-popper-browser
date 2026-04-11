@@ -57,7 +57,7 @@ function createRouter(settings) {
                 httpOnly: true,
                 sameSite: "lax",
             });
-            return res.redirect("/playlists/" + id);
+            return res.send('<script>location.replace("/playlists/' + id + '")</script>');
         }
 
         return res.render("playlist_lock", {
@@ -118,6 +118,7 @@ function createRouter(settings) {
             return res.render("playlists", {
                 items: items,
                 homeUrl: homeUrl,
+                showHome: true,
             });
         }
 
@@ -160,6 +161,7 @@ function createRouter(settings) {
         res.render("playlists", {
             items: items,
             homeUrl: homeUrl,
+            showHome: true,
             error: error,
         });
     });
@@ -198,7 +200,8 @@ function createRouter(settings) {
             src: req.app.locals.getWheelSrc(game),
             placeholder: "/images/wheel_loading_" + rotation + ".gif",
             cssClass: rotation ? "rotate" + rotation : "",
-            favorite: !!game.favorite,
+            favorite: game.favorite || 0,
+            gameId: game.id,
         };
     }
 

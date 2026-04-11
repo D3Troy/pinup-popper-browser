@@ -1,14 +1,17 @@
 extends layout
 
 block content
-  nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.bg-dark
-    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+  nav.navbar.navbar-expand-lg.fixed-top.px-3.bg-body-tertiary(data-bs-theme="dark")
+    button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
-    div.d-flex.align-items-center.ml-auto.order-md-last
-      a(href=homeUrl, title="Home")
-        img(src="/images/home.png", alt="Home", width="35", height="35")
+    div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
+      a.navbar-icon(href=homeUrl, title="Home")
+        i.bi.bi-house-fill.fs-4
+      if !kioskMode
+        a.navbar-icon(href='/settings', title="Settings")
+          i.bi.bi-gear-fill.fs-4
     div.collapse.navbar-collapse(id='navbarNav')
-      ul.navbar-nav.nav.mr-auto
+      ul.navbar-nav.nav.me-auto
         li.nav-item
           a.nav-link(href='/home') Home
         li.nav-item
@@ -17,7 +20,7 @@ block content
   div.container-fluid
     div.row.justify-content-center.mt-5
       div.col-12.col-sm-8.col-md-5.col-lg-4
-        div.card.bg-dark.text-white
+        div.card(data-bs-theme="dark")
           div.card-body.text-center
             h5.card-title.mb-3 #{display}
             p.text-muted This playlist is protected. Enter the PIN to continue.
@@ -26,7 +29,7 @@ block content
               div.alert.alert-danger(role='alert') #{error}
 
             form#lockForm(method='POST', action='/playlists/' + playlistId + '/unlock')
-              div.form-group
+              div.mb-3
                 input#pinInput.form-control.text-center(
                   type='password',
                   name='pin',
@@ -37,7 +40,7 @@ block content
                   pattern='[0-9]{4}',
                   inputmode='numeric'
                 )
-              button.btn.btn-primary.btn-block(type='submit') Unlock
+              button.btn.btn-primary.d-block.w-100(type='submit') Unlock
             a.btn.btn-secondary.btn-block.mt-2(href='/playlists') Cancel
             script.
               document.getElementById('pinInput').addEventListener('keydown', function(e) {

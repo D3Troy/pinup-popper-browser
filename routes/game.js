@@ -23,16 +23,75 @@ function createRouter(settings) {
     return response.json();
   }
 
+  const folderMap = (settings.media && settings.media.folders) || {};
+
   router.get("/:gameId/info", function (req, res) {
-    getMediaFilenames(req, res, "GameInfo", ["png", "jpg"]);
+    getMediaFilenames(req, res, folderMap.info || "GameInfo", ["png", "jpg"]);
+  });
+
+  router.post("/:gameId/fav", function (req, res) {
+    const gameId = parseInt(req.params["gameId"], 10);
+    if (isNaN(gameId)) return res.status(400).json({ error: "Invalid input" });
+    const game = getGame(gameId, req);
+    if (!game) return res.status(404).json({ error: "Game not found" });
+
+    const newValue = game.favorite ? null : 1;
+    req.app.locals.runSql("UPDATE PlayListDetails SET isFav = ? WHERE GameID = ?", [newValue, gameId])
+      .then(function () {
+        game.favorite = newValue || 0;
+        res.json({ favorite: newValue || 0 });
+      })
+      .catch(function (err) {
+        res.status(500).json({ error: err.message });
+      });
+  });
+
+  router.post("/:gameId/rating", function (req, res) {
+    const gameId = parseInt(req.params["gameId"], 10);
+    if (isNaN(gameId)) return res.status(400).json({ error: "Invalid input" });
+    const game = getGame(gameId, req);
+    if (!game) return res.status(404).json({ error: "Game not found" });
+
+    const rating = parseInt(req.body && req.body.rating, 10);
+    if (isNaN(rating) || rating < 0 || rating > 5) {
+      return res.status(400).json({ error: "Rating must be between 0 and 5" });
+    }
+
+    req.app.locals.runSql("UPDATE Games SET GameRating = ? WHERE GameID = ?", [rating, gameId])
+      .then(function () {
+        game.rating = rating;
+        res.json({ rating: rating });
+      })
+      .catch(function (err) {
+        res.status(500).json({ error: err.message });
+      });
   });
 
   router.get("/:gameId/help", function (req, res) {
-    getMediaFilenames(req, res, "GameHelp", ["png", "jpg"]);
+    getMediaFilenames(req, res, folderMap.help || "GameHelp", ["png", "jpg"]);
   });
 
   router.get("/:gameId/playfield", function (req, res) {
-    getMediaFilenames(req, res, "Playfield", ["png", "jpg", "mp4"]);
+    getMediaFilenames(req, res, folderMap.playfield || "PlayField", ["png", "jpg", "mp4"]);
+  });
+
+  router.get("/:gameId/highscore", function (req, res) {
+    getMediaFilenames(req, res, folderMap.highscore || "Other2", ["png", "jpg"]);
+  });
+
+  router.get("/:gameId/media", function (req, res) {
+    const game = getGame(req.params["gameId"], req);
+    if (!game) { res.status(404).send({}); return; }
+    const slots = settings.options.game.media && typeof settings.options.game.media === "object"
+      ? settings.options.game.media
+      : { topper: true, backglass: true, fulldmd: true, dmd: false, playfield: true, help: true, info: true };
+    const result = {};
+    for (const type of MEDIA_OVERVIEW_TYPES) {
+      if (slots[type.key]) {
+        result[type.key] = resolveMediaFiles(game, req, type.dir, type.ext);
+      }
+    }
+    res.send(result);
   });
 
   router.get("/:gameId/launch", async function (req, res) {
@@ -126,32 +185,87 @@ function createRouter(settings) {
     let game = getGame(gameId, req);
     if (game) {
       const playlistId = req.query.playlist || null;
+      const homeUrl = playlistId ? "/playlists" : "/home";
+      const gameFields = req.app.locals.gameFields || [
+        "year", "type", "manufacturer", "numPlayers", "emulator",
+        "category", "theme", "lastPlayed", "numPlays", "rating",
+        "designedBy", "webLinkUrl", "gameVersion", "romName", "timePlayed",
+      ];
+      const dateFormat = req.app.locals.dateFormat || "medium";
+      const timeFormat = req.app.locals.timeFormat || "short";
+      const locale = req.app.locals.locale || undefined;
+      const fieldMeta = {
+        year:        { icon: 'calendar3', label: 'Year', value: game.year },
+        type:        { icon: 'controller', label: 'Type', value: game.type },
+        manufacturer:{ icon: 'building', label: 'Manufacturer', value: game.manufacturer },
+        numPlayers:  { icon: 'people', label: 'Players', value: game.numPlayers },
+        emulator:    { icon: 'cpu', label: 'Emulator', value: game.emulator && game.emulator.name },
+        category:    { icon: 'tag', label: 'Category', value: game.category },
+        theme:       { icon: 'palette', label: 'Theme', value: game.theme },
+        lastPlayed:  { icon: 'clock-history', label: 'Last Played', value: game.lastPlayed },
+        numPlays:    { icon: 'play-circle', label: 'Times Played', value: game.numPlays },
+        timePlayed:  { icon: 'hourglass-split', label: 'Time Played', value: game.timePlayed },
+        designedBy:  { icon: 'person-badge', label: 'Designed By', value: game.designedBy },
+        webLinkUrl:  { icon: 'link-45deg', label: 'Web Link', value: game.webLinkUrl },
+        gameVersion: { icon: 'hash', label: 'Version', value: game.gameVersion },
+        gameDescription: { icon: 'info-circle', label: 'Description', value: game.gameDescription },
+        romName:     { icon: 'file-earmark-binary', label: 'ROM', value: game.romName },
+        tableType:   { icon: 'table', label: 'Table Type', value: game.tableType },
+      };
 
+      function formatFieldValue(field, meta) {
+        if (field === 'lastPlayed') {
+          return meta.value ? { html: true, value: `<span data-lastplayed=\"${meta.value}\" data-dateformat=\"${req.app.locals.dateFormat}\" data-locale=\"${req.app.locals.locale}\">Loading…</span>` } : { html: false, value: 'Never' };
+        }
+        if (field === 'timePlayed') {
+          var t = meta.value || 0;
+          var h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = t%60;
+          return { html: false, value: t ? `${h ? h + 'h ' : ''}${m ? m + 'm ' : (h ? '0m ' : '')}${s}s` : '—' };
+        }
+        if (field === 'webLinkUrl') {
+          return meta.value ? { html: true, value: `<a href=\"${meta.value}\" target=\"_blank\">${meta.value}</a>` } : { html: false, value: '—' };
+        }
+        return (meta.value !== undefined && meta.value !== null && meta.value !== '') ? { html: false, value: meta.value } : { html: false, value: '—' };
+      }
+      const gameFieldRows = gameFields.filter(f => f !== 'rating').map(field => {
+        const meta = fieldMeta[field] || { icon: 'question-circle', label: field, value: game[field] };
+        const formatted = formatFieldValue(field, meta);
+        return { icon: meta.icon, label: meta.label, value: formatted.value, html: formatted.html };
+      });
       res.render("game", {
         game: game,
         info: settings.options.game.info,
         help: settings.options.game.help,
         playfield: settings.options.game.playfield,
+        media: settings.options.game.media && typeof settings.options.game.media === "object"
+          ? settings.options.game.media
+          : (settings.options.game.media ? { topper: true, backglass: true, dmd: true, playfield: true, help: true, info: true } : false),
+        highscore: settings.options.game.highscore,
         playlistId: playlistId,
+        homeUrl: homeUrl,
         wheelRotation: settings.media.useThumbs
           ? req.app.locals.globalSettings.thumbRotation
           : 0,
         playfieldRotation: settings.media.playfieldRotation,
         refreshInterval: req.app.locals.globalSettings.currentGameRefreshTimer,
+        dateFormat: dateFormat,
+        timeFormat: timeFormat,
+        locale: locale,
+        gameFields: gameFields,
+        gameFieldRows,
       });
     } else {
       renderGameError(req, res, "Game not found");
     }
   }
 
-  function escapeRegExp(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g, "\\$&");
+  function escapeGlob(text) {
+    return text.replace(/[*?[\]{}()!@+^]/g, (c) => `[${c}]`);
   }
 
-  function getMediaFilenames(req, res, mediaDir, extensions) {
-    const game = getGame(req.params["gameId"], req);
+  function resolveMediaFiles(game, req, mediaDir, extensions) {
     const patterns = extensions.map(
-      (ext) => escapeRegExp(game.name) + "*." + ext
+      (ext) => escapeGlob(game.name) + "*." + ext
     );
     const dir = game.emulator.dirMedia.replace(/\\/g, "/") + "/" + mediaDir;
     const files = fs.globSync(patterns, { cwd: dir });
@@ -169,8 +283,24 @@ function createRouter(settings) {
         )
       );
     }
-    res.send(result);
+    return result;
   }
+
+  function getMediaFilenames(req, res, mediaDir, extensions) {
+    const game = getGame(req.params["gameId"], req);
+    if (!game) { res.send([]); return; }
+    res.send(resolveMediaFiles(game, req, mediaDir, extensions));
+  }
+
+  const MEDIA_OVERVIEW_TYPES = [
+    { key: "topper",    dir: folderMap.topper    || "Topper",    ext: ["png", "jpg", "mp4"] },
+    { key: "backglass", dir: folderMap.backglass  || "BackGlass", ext: ["png", "jpg", "mp4"] },
+    { key: "fulldmd",   dir: folderMap.fulldmd    || "Menu",      ext: ["png", "jpg", "mp4"] },
+    { key: "dmd",   dir: folderMap.dmd    || "DMD",       ext: ["png", "jpg", "mp4"] },
+    { key: "playfield", dir: folderMap.playfield  || "PlayField", ext: ["png", "jpg", "mp4"] },
+    { key: "help",      dir: folderMap.help       || "GameHelp",  ext: ["png", "jpg"] },
+    { key: "info",      dir: folderMap.info       || "GameInfo",  ext: ["png", "jpg"] },
+  ];
 
   return router;
 }
