@@ -33,7 +33,7 @@ options:
       playfield: true
       help: true
       info: true
-  dateFormat: dd.MM.yyyy HH.mm
+  dateFormat: dd.MM.yyyy HH:mm
 
   # Available fields: year, type, manufacturer, numPlayers, emulator,
   #   category, theme, rating, lastPlayed, numPlays, timePlayed,
@@ -50,7 +50,7 @@ options:
     - designedBy
     - webLinkUrl
     - gameVersion
-    - romName
+    - rating
 
 media:
   useThumbs: true
