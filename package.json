@@ -1,6 +1,6 @@
 {
   "name": "pinup-popper-browser",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "GPL-3.0",
   "description": "An app for browsing your Pinup Popper games",
   "private": true,
@@ -53,10 +53,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/doogie2301/pinup-popper-browser"
+    "url": "git://github.com/d3troy/pinup-popper-browser"
   },
-  "homepage": "https://github.com/doogie2301/pinup-popper-browser",
+  "homepage": "https://github.com/d3troy/pinup-popper-browser",
   "bugs": {
-    "url": "https://github.com/doogie2301/pinup-popper-browser/issues"
+    "url": "https://github.com/d3troy/pinup-popper-browser/issues"
   }
 }

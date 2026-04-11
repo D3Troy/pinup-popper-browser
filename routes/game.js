@@ -186,7 +186,14 @@ function createRouter(settings) {
     if (game) {
       const playlistId = req.query.playlist || null;
       const homeUrl = playlistId ? "/playlists" : "/home";
-      const gameFields = req.app.locals.gameFields;
+      const gameFields = req.app.locals.gameFields || [
+        "year", "type", "manufacturer", "numPlayers", "emulator",
+        "category", "theme", "lastPlayed", "numPlays", "rating",
+        "designedBy", "webLinkUrl", "gameVersion", "romName", "timePlayed",
+      ];
+      const dateFormat = req.app.locals.dateFormat || "medium";
+      const timeFormat = req.app.locals.timeFormat || "short";
+      const locale = req.app.locals.locale || undefined;
       const fieldMeta = {
         year:        { icon: 'calendar3', label: 'Year', value: game.year },
         type:        { icon: 'controller', label: 'Type', value: game.type },
@@ -241,10 +248,10 @@ function createRouter(settings) {
           : 0,
         playfieldRotation: settings.media.playfieldRotation,
         refreshInterval: req.app.locals.globalSettings.currentGameRefreshTimer,
-        dateFormat: req.app.locals.dateFormat,
-        timeFormat: req.app.locals.timeFormat,
-        locale: req.app.locals.locale,
-        gameFields: req.app.locals.gameFields,
+        dateFormat: dateFormat,
+        timeFormat: timeFormat,
+        locale: locale,
+        gameFields: gameFields,
         gameFieldRows,
       });
     } else {

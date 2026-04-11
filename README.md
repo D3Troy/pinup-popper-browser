@@ -243,7 +243,7 @@ This project is a contribution to the virtual pinball community, and is complete
 
 <a href="https://www.buymeacoffee.com/d3troy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-black.png" alt="Buy Me A Coffee" height="35"></a>
 
-Please also consider sponsoring doogie for the original project this fork is based on.
+Please also consider sponsoring doogie2301 for the original project this fork is based on.
 
 <a href="https://www.buymeacoffee.com/doogie2301" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-black.png" alt="Buy Me A Coffee" height="35"></a>
 
