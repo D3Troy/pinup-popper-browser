@@ -140,18 +140,19 @@ document.addEventListener("DOMContentLoaded", function () {
   var toggleBtn = document.createElement("button");
   toggleBtn.id = "darkModeToggle";
   toggleBtn.type = "button";
-  toggleBtn.className = "btn btn-outline-light btn-sm";
+  toggleBtn.className = "btn btn-mode-toggle";
   toggleBtn.setAttribute("aria-label", "Toggle dark mode");
-  toggleBtn.innerHTML = htmlEl.getAttribute("data-bs-theme") === "dark" ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+  toggleBtn.innerHTML = htmlEl.getAttribute("data-bs-theme") === "dark" ? '<i class="bi bi-sun-fill fs-4"></i>' : '<i class="bi bi-moon-stars-fill fs-4"></i>';
   toggleBtn.addEventListener("click", function () {
     var next = htmlEl.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
     htmlEl.setAttribute("data-bs-theme", next);
     localStorage.setItem("theme", next);
-    this.innerHTML = next === "dark" ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+    this.innerHTML = next === "dark" ? '<i class="bi bi-sun-fill fs-4"></i>' : '<i class="bi bi-moon-stars-fill fs-4"></i>';
   });
   var navbarRight = document.getElementById("navbarRight");
-  var navbarTarget = navbarRight || document.querySelector(".navbar");
-  if (navbarTarget) navbarTarget.appendChild(toggleBtn);
+  if (navbarRight) {
+    navbarRight.appendChild(toggleBtn);
+  }
 
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
     new bootstrap.Tooltip(el);
@@ -194,7 +195,8 @@ document.addEventListener("DOMContentLoaded", function () {
           .then(function (data) {
             if (document.getElementById("mediaTopper"))    renderMediaSlot("#mediaTopper",    data.topper    || []);
             if (document.getElementById("mediaBackglass")) renderMediaSlot("#mediaBackglass", data.backglass || []);
-            if (document.getElementById("mediaDMD"))       renderMediaSlot("#mediaDMD",       data.dmd       || []);
+            if (document.getElementById("mediaFullDmd"))   renderMediaSlot("#mediaFullDmd",   data.fulldmd   || []);
+            if (document.getElementById("mediaDmd"))   renderMediaSlot("#mediaDmd",   data.dmd   || []);
             if (document.getElementById("mediaPlayfield")) renderMediaSlot("#mediaPlayfield", data.playfield || []);
             if (document.getElementById("mediaHelp"))      renderMediaSlot("#mediaHelp",      data.help      || []);
             if (document.getElementById("mediaInfo"))      renderMediaSlot("#mediaInfo",      data.info      || []);
@@ -506,9 +508,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function search(searchbox) {
     var value = searchbox.value.toLowerCase();
-    document.querySelectorAll("#gamesRow div.game").forEach(function (el) {
-      var anchor = el.querySelector("a");
-      var title = (anchor ? anchor.title : "").toLowerCase();
+    document.querySelectorAll("#gamesRow div.game, #playlistsRow div.game").forEach(function (el) {
+      var anchor = el.querySelector("a[data-original-title]");
+      var title = (anchor ? anchor.getAttribute("data-original-title") : "").toLowerCase();
       el.style.display = title.indexOf(value) > -1 ? "" : "none";
     });
     updateGameCount();
@@ -531,6 +533,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (gameSearch.value) {
       search(gameSearch);
+    }
+
+    var mobileSearchToggle = document.getElementById("mobileSearchToggle");
+    var navbarRight = document.getElementById("navbarRight");
+    if (mobileSearchToggle && navbarRight) {
+      mobileSearchToggle.addEventListener("click", function () {
+        navbarRight.classList.toggle("search-open");
+        if (navbarRight.classList.contains("search-open") && gameSearch) {
+          gameSearch.focus();
+        }
+      });
+      document.addEventListener("click", function (e) {
+        if (!navbarRight.contains(e.target)) {
+          navbarRight.classList.remove("search-open");
+        }
+      });
     }
   }
   checkFilter();

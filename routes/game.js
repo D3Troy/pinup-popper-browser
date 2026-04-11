@@ -84,7 +84,7 @@ function createRouter(settings) {
     if (!game) { res.status(404).send({}); return; }
     const slots = settings.options.game.media && typeof settings.options.game.media === "object"
       ? settings.options.game.media
-      : { topper: true, backglass: true, dmd: true, playfield: true, help: true, info: true };
+      : { topper: true, backglass: true, fulldmd: true, dmd: false, playfield: true, help: true, info: true };
     const result = {};
     for (const type of MEDIA_OVERVIEW_TYPES) {
       if (slots[type.key]) {
@@ -288,8 +288,9 @@ function createRouter(settings) {
   const MEDIA_OVERVIEW_TYPES = [
     { key: "topper",    dir: folderMap.topper    || "Topper",    ext: ["png", "jpg", "mp4"] },
     { key: "backglass", dir: folderMap.backglass  || "BackGlass", ext: ["png", "jpg", "mp4"] },
-    { key: "dmd",       dir: folderMap.dmd        || "Menu",      ext: ["png", "jpg", "mp4"] },
-    { key: "playfield", dir: folderMap.playfield  || "Playfield", ext: ["png", "jpg", "mp4"] },
+    { key: "fulldmd",   dir: folderMap.fulldmd    || "Menu",      ext: ["png", "jpg", "mp4"] },
+    { key: "dmd",   dir: folderMap.dmd    || "DMD",       ext: ["png", "jpg", "mp4"] },
+    { key: "playfield", dir: folderMap.playfield  || "PlayField", ext: ["png", "jpg", "mp4"] },
     { key: "help",      dir: folderMap.help       || "GameHelp",  ext: ["png", "jpg"] },
     { key: "info",      dir: folderMap.info       || "GameInfo",  ext: ["png", "jpg"] },
   ];

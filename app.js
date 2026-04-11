@@ -186,6 +186,7 @@ async function start() {
   app.locals.gameIds = gameIds;
   app.locals.globalSettings = globalSettings;
   app.locals.settings = settings;
+  app.locals.kioskMode = !!(settings.options && settings.options.kioskMode);
   app.locals.dateFormat = (settings.options && settings.options.dateFormat) || 'medium';
   app.locals.timeFormat = (settings.options && settings.options.timeFormat) || 'short';
   app.locals.locale = (settings.options && settings.options.locale) || undefined;

@@ -6,8 +6,6 @@ block content
       span.navbar-toggler-icon
     span.navbar-brand.mb-0.ms-2 Settings
     div#navbarNav.collapse.navbar-collapse
-    a(href='/settings', title='Settings')
-      i.bi.bi-gear-fill.fs-5
 
   div.settings-page
 
@@ -150,10 +148,11 @@ block content
         div.mt-3
           p.settings-sublabel Media Folder Names
           p.settings-field-hint Visible column enables the panel in the Media tab. Folder sets which subfolder to read from.
-          - const folderSlots = ['topper','backglass','dmd','playfield','help','info','highscore']
-          - const folderDefaults = {topper:'Topper',backglass:'BackGlass',dmd:'Menu',playfield:'PlayField',help:'GameHelp',info:'GameInfo',highscore:'Other2'}
-          - const folderOptions = ['BackGlass','GameHelp','GameInfo','Menu','Other1','Other2','PlayField','Topper']
-          - const mediaSlots = ['topper','backglass','dmd','playfield','help','info']
+          - const folderSlots = ['topper','backglass','fulldmd','dmd','playfield','help','info','highscore']
+          - const folderDefaults = {topper:'Topper',backglass:'BackGlass',fulldmd:'Menu',dmd:'DMD',playfield:'PlayField',help:'GameHelp',info:'GameInfo',highscore:'Other2'}
+          - const folderLabels  = {topper:'Topper',backglass:'BackGlass',fulldmd:'Full DMD',dmd:'DMD',playfield:'PlayField',help:'Help',info:'Info',highscore:'Highscore'}
+          - const folderOptions = ['BackGlass','DMD','GameHelp','GameInfo','Menu','Other1','Other2','PlayField','Topper']
+          - const mediaSlots = ['topper','backglass','fulldmd','dmd','playfield','help','info']
           table.settings-folder-table
             thead
               tr
@@ -169,11 +168,15 @@ block content
                   td.settings-folder-check
                     if hasVisibility
                       input(type='checkbox', name=`game.media.${slot}`, checked=isVisible)
-                  td.settings-folder-label= slot.charAt(0).toUpperCase() + slot.slice(1)
+                  td.settings-folder-label= folderLabels[slot]
                   td
-                    select.form-select.form-select-sm(name=`media.folders.${slot}`)
-                      each opt in folderOptions
-                        option(value=opt, selected=opt === current) #{opt}
+                    if slot === 'playfield'
+                      span.form-control-plaintext.form-control-sm.ps-2 PlayField
+                      input(type='hidden', name='media.folders.playfield', value='PlayField')
+                    else
+                      select.form-select.form-select-sm(name=`media.folders.${slot}`)
+                        each opt in folderOptions
+                          option(value=opt, selected=opt === current) #{opt}
 
       div.settings-footer
         a.btn.btn-secondary(href='/') Cancel

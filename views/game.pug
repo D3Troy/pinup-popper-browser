@@ -5,10 +5,13 @@ block content
     button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     div#navbarRight.d-flex.align-items-center.ms-auto.order-md-last.gap-2
+      // No search bar on this page
       a(href=homeUrl, title="Home")
         i.bi.bi-house-fill.fs-4
-      a(href='/settings', title="Settings")
-        i.bi.bi-gear-fill.fs-5
+      if !kioskMode
+        a(href='/settings', title="Settings")
+          i.bi.bi-gear-fill.fs-4
+      // Mode toggle will be injected by JS as last
     #navbarNav.collapse.navbar-collapse
       ul#tabs.navbar-nav.nav
         li.nav-item
@@ -105,7 +108,7 @@ block content
                   button#btnLaunch.btn.btn-primary.px-4(type='button', data-id=game.id) Launch Game
 
       if media
-        - const hasLeftMedia = !!(media.topper || media.backglass || media.dmd || media.info || media.help)
+        - const hasLeftMedia = !!(media.topper || media.backglass || media.fulldmd || media.dmd || media.info || media.help)
         #media.tab-pane.fade
           .media-two-col
             if hasLeftMedia
@@ -119,10 +122,14 @@ block content
                     .media-ov-block
                       .media-ov-slot-wrap
                         #mediaBackglass.media-ov-slot
-                  if (media && media.dmd)
+                  if (media && media.fulldmd)
                     .media-ov-block
                       .media-ov-slot-wrap
-                        #mediaDMD.media-ov-slot
+                        #mediaFullDmd.media-ov-slot
+                  if (media && media.dmd)
+                    .media-ov-block.media-ov-block--minidmd
+                      .media-ov-slot-wrap
+                        #mediaDmd.media-ov-slot
                   if (media && (media.info || media.help))
                     .media-ov-block.media-ov-block--half.media-ov-row
                       if (media && media.info)

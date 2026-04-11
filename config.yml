@@ -10,6 +10,7 @@ httpServer:
   logLevel: error
 
 options:
+  kioskMode: false
   defaultView: playlists  # home | playlists
   filters:
     category: true
@@ -27,7 +28,8 @@ options:
     media:
       topper: false
       backglass: true
-      dmd: true
+      fulldmd: true
+      dmd: false
       playfield: true
       help: true
       info: true
@@ -57,7 +59,8 @@ media:
   folders:
     topper: Topper
     backglass: BackGlass
-    dmd: Menu
+    fulldmd: Menu
+    dmd: DMD
     playfield: PlayField
     help: GameHelp
     info: GameInfo
