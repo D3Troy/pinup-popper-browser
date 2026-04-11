@@ -28,65 +28,52 @@ Credit goes to the original creator, [doogie2301](https://github.com/doogie2301)
     - **Random Game** - A randomly selected game
   - **Filters** - The game list can be filtered by one of the following fields: Category, Theme, Type, Decade, Emulator, Manufacturer, and Favorites.
   - **Search Box** - Filters the games by name containing the entered text
+  - **Favorites** 🆕 - Favorite state is visible in the grid and can be toggled from the game view.
+  - **Theme Toggle** 🆕 - Single-button light/dark mode toggle in the navbar.
 
 - **Game View** - Displays the details for a single game
 
   ![game](docs/images/game-view.png)
 
   - **Summary** - Disaplays the wheel image and basic information about the game
+    - **Rating editor** 🆕 - Ratings can be changed directly in the game view.
+    - **Favorite toggle** 🆕 - Favorite status can be changed directly in the game view.
+    - **Web Link** 🆕 - Opens the configured game URL directly from the game view.
     - **Launch Game\*** - Launches the game in Pinup Popper
     - **Exit Current Game\*** - Exits the current game in Pinup Popper
   - **Info** - Displays any images starting with the game name from the GameInfo media folder
   - **Help** - Displays any images starting with the gaame name from the GameHelp media folder
   - **Playfield** - Displays an image or video with the game name from the Playfield media folder
+  - **Highscore** 🆕 - Displays matching images from the configured highscore media folder.
+  - **Media Overview** 🆕 - Shows Topper, BackGlass, Full DMD, DMD, Playfield, GameInfo, and GameHelp together in one view.
 
 ## Additional Features In This Fork
 
-- **Themes: Light and Dark**
-  Adds a light theme and a dark theme with a single-button theme toggle in the navbar.
+This fork expands the original project with a more modern UI, playlist browsing, a built-in settings experience, and additional media options.
 
-  ![light-dark-mode](docs/images/light-dark-mode.gif)
+### UI Refresh
 
-- **Upgraded to Bootstrap 5**
-  Modernizes the UI stack and enables newer responsive layout and component behavior.
+The interface has been upgraded to Bootstrap 5 and Bootstrap Icons, and now includes light and dark themes with a single-button theme toggle in the navbar.
 
-- **Added Bootstrap Icons**
-  Adds a consistent icon set across navigation, actions, ratings, and media controls.
+![light-dark-mode](docs/images/light-dark-mode.gif)
 
-- **Added Playlists View**
-  Adds a dedicated playlists browser with nested playlists, locked playlists, and a visual `Go Back` tile.
+### Playlists
 
-  ![playlists-view](docs/images/playlists-view.png)
+A dedicated Playlists view has been added with nested playlists, locked playlists, and a visual `Go Back` tile for easier navigation.
 
-- **More responsive design for mobile devices**
-  Improves navigation, game actions, media layouts, and settings behavior on smaller screens.
+![playlists-view](docs/images/playlists-view.png)
 
-- **Favorites can be toggled directly in the game view**
-  Lets you mark and unmark favorites without returning to the main grid.
+### Game View Improvements
 
-- **Ratings can be changed directly in the game view**
-  Lets you update game ratings directly from the summary section.
+The game view adds direct favorites and rating updates, a direct Web Link action, Highscore tab support, and a Media Overview tab for Topper, BackGlass, Full DMD, DMD, Playfield, GameInfo, and GameHelp.
 
-- **Added direct Web Link action in the game view**
-  Opens the configured game URL directly from the game summary.
+### Settings And Configuration
 
-- **Added Highscore tab support**
-  Displays matching images from the configured highscore media folder.
+This fork adds a built-in Settings page for managing the default view, visible game fields, game field ordering, media folder mappings, and other runtime options without manually editing `config.yml`.
 
-- **Added Media Overview tab**
-  Shows Topper, BackGlass, Full DMD, DMD, Playfield, GameInfo, and GameHelp together in one responsive media dashboard.
+### Mobile Improvements
 
-- **Added built-in Settings page**
-  Adds a web-based settings UI for editing app behavior without manually changing `config.yml`.
-
-- **Added drag-and-drop ordering for game fields**
-  Lets you reorder visible metadata fields from the Settings page.
-
-- **Added configurable default view**
-  Lets you choose whether the app opens on `home` or `playlists`.
-
-- **Added configurable media folder mappings**
-  Lets you map media slots to custom Pinup Popper media folders, including `highscore`.
+The layout has been improved for mobile devices, including navigation, game actions, settings previews, and responsive media layouts.
 
 ## Setup
 
