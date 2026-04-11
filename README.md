@@ -10,7 +10,7 @@ This repository is a fork of the original `pinup-popper-browser` project with ad
 
 Credit goes to the original creator, [doogie2301](https://github.com/doogie2301), for the original project and foundation this fork builds on:
 
-- Original project: https://github.com/d3troy/pinup-popper-browser
+- Original project: https://github.com/doogie2301/pinup-popper-browser
 
 [![Build Status](https://github.com/d3troy/pinup-popper-browser/actions/workflows/ci.yml/badge.svg)](https://github.com/d3troy/pinup-popper-browser/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/d3troy/pinup-popper-browser/branch/master/graph/badge.svg)](https://codecov.io/gh/d3troy/pinup-popper-browser)
@@ -45,8 +45,7 @@ Credit goes to the original creator, [doogie2301](https://github.com/doogie2301)
 - **Themes: Light and Dark**
   Adds a light theme and a dark theme with a single-button theme toggle in the navbar.
 
-  ![light-mode](docs/images/light-mode.png)
-  ![dark-mode](docs/images/dark-mode.png)
+  ![light-dark-mode](docs/images/light-dark-mode.gif)
 
 - **Upgraded to Bootstrap 5**
   Modernizes the UI stack and enables newer responsive layout and component behavior.
