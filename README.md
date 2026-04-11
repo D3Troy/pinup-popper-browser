@@ -14,7 +14,7 @@ Credit goes to the original creator, [doogie2301](https://github.com/doogie2301)
 
 [![Build Status](https://github.com/d3troy/pinup-popper-browser/actions/workflows/ci.yml/badge.svg)](https://github.com/d3troy/pinup-popper-browser/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/d3troy/pinup-popper-browser/branch/master/graph/badge.svg)](https://codecov.io/gh/d3troy/pinup-popper-browser)
-[![Dependabot](https://img.shields.io/github/dependabot-status/d3troy/pinup-popper-browser?logo=dependabot)](https://github.com/d3troy/pinup-popper-browser/network/updates)
+[![Dependabot](https://img.shields.io/badge/Dependabot-active-brightgreen.svg)](https://github.com/d3troy/pinup-popper-browser/network/updates)
 
 ## Features
 
