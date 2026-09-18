@@ -2,7 +2,7 @@
 const express = require("express");
 const fs = require("node:fs/promises");
 const YAML = require("yaml");
-const { resolveConfigPath } = require("../settings");
+const { resolveConfigPath, applyThumbRotationOverride } = require("../settings");
 
 function formatDateExample(fmt) {
   const now = new Date();
@@ -55,6 +55,7 @@ function createRouter(settings) {
       wheelRotation,
       homeSamples,
       playlistSamples,
+      pupThumbRotation: req.app.locals.globalSettings.pupThumbRotation || 0,
       dateFormatExample: formatDateExample(settings.options.dateFormat),
       isSettingsPage: true,
     });
@@ -97,6 +98,13 @@ function createRouter(settings) {
     settings.media.useThumbs         = b["media.useThumbs"]          === "on";
     settings.media.playfieldRotation = b["media.playfieldRotation"]  === "on";
     settings.media.cacheInMinutes    = parseInt(b["media.cacheInMinutes"], 10) || settings.media.cacheInMinutes;
+
+    const rotationOverride = b["media.thumbRotationOverride"];
+    settings.media.thumbRotationOverride =
+      rotationOverride === undefined || rotationOverride === ""
+        ? null
+        : parseInt(rotationOverride, 10);
+    applyThumbRotationOverride(settings, req.app.locals.globalSettings);
 
     const folderSlots = ["topper", "backglass", "fulldmd", "dmd", "playfield", "help", "info", "highscore"];
     if (!settings.media.folders) settings.media.folders = {};

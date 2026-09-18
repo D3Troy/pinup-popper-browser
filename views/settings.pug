@@ -141,6 +141,18 @@ block content
               p.settings-field-hint Rotate playfield images/videos 90° for portrait-oriented monitors.
         div.settings-row.mt-3
           div.settings-field-group
+            label.settings-label Wheel/Thumbnail Rotation
+            p.settings-field-hint
+              | PinUP Popper reports #{pupThumbRotation}°. Override only if thumbnails still look rotated wrong.
+          - const rotationOverride = cfg.media.thumbRotationOverride
+          select.form-select.settings-input(name='media.thumbRotationOverride')
+            option(value='', selected=(rotationOverride === null || rotationOverride === undefined)) Auto (use PinUP Popper's setting)
+            option(value='0', selected=rotationOverride === 0) 0°
+            option(value='90', selected=rotationOverride === 90) 90°
+            option(value='180', selected=rotationOverride === 180) 180°
+            option(value='270', selected=rotationOverride === 270) 270°
+        div.settings-row.mt-3
+          div.settings-field-group
             label.settings-label Cache (minutes)
             p.settings-field-hint How long the browser caches media files. Set to 0 to disable.
           input.form-control.settings-input(type='number', name='media.cacheInMinutes', value=cfg.media.cacheInMinutes, min='0')

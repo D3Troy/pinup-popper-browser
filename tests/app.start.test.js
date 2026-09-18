@@ -89,6 +89,13 @@ describe("app startup", () => {
                     game: { info: true, help: true, playfield: true },
                 },
             })),
+            applyThumbRotationOverride: jest.fn((settings, globalSettings) => {
+                const override = settings.media && settings.media.thumbRotationOverride;
+                globalSettings.thumbRotation =
+                    override === null || override === undefined
+                        ? globalSettings.pupThumbRotation
+                        : override;
+            }),
         }));
 
         const dbClose = jest.fn();
@@ -181,6 +188,13 @@ describe("app startup", () => {
                     game: { info: false, help: false, playfield: false },
                 },
             })),
+            applyThumbRotationOverride: jest.fn((settings, globalSettings) => {
+                const override = settings.media && settings.media.thumbRotationOverride;
+                globalSettings.thumbRotation =
+                    override === null || override === undefined
+                        ? globalSettings.pupThumbRotation
+                        : override;
+            }),
         }));
 
         const dbClose = jest.fn(() => {

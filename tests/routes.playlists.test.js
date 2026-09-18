@@ -512,4 +512,49 @@ describe("routes/playlists", () => {
         expect(response.body.options.items[0].goBack).toBe(true);
         expect(response.body.options.items[0].src).toContain("goback_thumb.png");
     });
+
+    test("GET / applies thumbRotation CSS class to playlist thumbnails when useThumbs is true", async () => {
+        settings.media.useThumbs = true;
+        const locals = baseLocals();
+        locals.globalSettings = { thumbRotation: 270 };
+        locals.queryRows.mockReturnValue([{
+            PlayListID: 1, Logo: "logo", PlayDisplay: "My Playlist", PlayName: "MyPlaylist",
+            PlayListParent: 0, PlayListSQL: "", passcode: "", Visible: 1,
+        }]);
+
+        const createRouter = require("../routes/playlists");
+        const router = createRouter(settings);
+        const app = createPlaylistApp(router, locals);
+
+        const response = await request(app).get("/playlists/");
+
+        expect(response.status).toBe(200);
+        expect(response.body.options.items[0].cssClass).toBe("rotate270");
+    });
+
+    test("GET /:id applies thumbRotation CSS class to child playlist and goBack thumbnails", async () => {
+        settings.media.useThumbs = true;
+        const locals = baseLocals();
+        locals.globalSettings = { thumbRotation: 90 };
+        locals.queryRows
+            .mockReturnValueOnce([{
+                PlayListID: 1, Logo: "parent", PlayDisplay: "Parent", PlayName: "Parent",
+                PlayListParent: 0, PlayListSQL: "", passcode: "", Visible: 1,
+            }])
+            .mockReturnValueOnce([{
+                PlayListID: 2, Logo: "child", PlayDisplay: "Child", PlayName: "Child",
+                PlayListParent: 1, PlayListSQL: "", passcode: "", Visible: 1,
+            }]);
+
+        const createRouter = require("../routes/playlists");
+        const router = createRouter(settings);
+        const app = createPlaylistApp(router, locals);
+
+        const response = await request(app).get("/playlists/1");
+
+        expect(response.status).toBe(200);
+        expect(response.body.options.items[0].goBack).toBe(true);
+        expect(response.body.options.items[0].cssClass).toBe("rotate90");
+        expect(response.body.options.items[1].cssClass).toBe("rotate90");
+    });
 });

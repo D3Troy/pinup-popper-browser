@@ -56,6 +56,10 @@ media:
   useThumbs: true
   cacheInMinutes: 20
   playfieldRotation: true
+  # Overrides the wheel/thumbnail rotation reported by PinUP Popper's own
+  # ThumbRotate setting. Leave as null to use PinUP Popper's value as-is.
+  # Set to 0, 90, 180 or 270 if thumbnails still appear rotated incorrectly.
+  thumbRotationOverride: null
   folders:
     topper: Topper
     backglass: BackGlass

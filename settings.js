@@ -44,7 +44,16 @@ async function loadSettings() {
     return parsed;
 }
 
+function applyThumbRotationOverride(settings, globalSettings) {
+    var override = settings.media && settings.media.thumbRotationOverride;
+    globalSettings.thumbRotation =
+        override === null || override === undefined
+            ? globalSettings.pupThumbRotation
+            : override;
+}
+
 module.exports = {
     resolveConfigPath,
     loadSettings,
+    applyThumbRotationOverride,
 };

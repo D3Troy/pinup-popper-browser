@@ -75,3 +75,31 @@ describe("settings loader", () => {
         await expect(loadSettings()).rejects.toThrow("Invalid YAML configuration");
     });
 });
+
+describe("applyThumbRotationOverride", () => {
+    const { applyThumbRotationOverride } = require("../settings");
+
+    test("uses PinUP Popper's value when no override is set", () => {
+        const globalSettings = { pupThumbRotation: 90 };
+        applyThumbRotationOverride({ media: { thumbRotationOverride: null } }, globalSettings);
+        expect(globalSettings.thumbRotation).toBe(90);
+    });
+
+    test("uses PinUP Popper's value when override is undefined", () => {
+        const globalSettings = { pupThumbRotation: 270 };
+        applyThumbRotationOverride({ media: {} }, globalSettings);
+        expect(globalSettings.thumbRotation).toBe(270);
+    });
+
+    test("uses the override value when set, even to 0", () => {
+        const globalSettings = { pupThumbRotation: 90 };
+        applyThumbRotationOverride({ media: { thumbRotationOverride: 0 } }, globalSettings);
+        expect(globalSettings.thumbRotation).toBe(0);
+    });
+
+    test("uses the override value when it differs from PinUP Popper's value", () => {
+        const globalSettings = { pupThumbRotation: 90 };
+        applyThumbRotationOverride({ media: { thumbRotationOverride: 180 } }, globalSettings);
+        expect(globalSettings.thumbRotation).toBe(180);
+    });
+});
