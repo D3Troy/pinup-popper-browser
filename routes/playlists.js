@@ -109,7 +109,7 @@ function createRouter(settings) {
         var useThumbs = !!(settings.media && settings.media.useThumbs);
         var children = getPlaylists(req, id);
         var backUrl = parent.parent > 0 ? "/playlists/" + parent.parent : "/playlists";
-        var goBack = toGoBackItem(backUrl, useThumbs);
+        var goBack = toGoBackItem(backUrl, useThumbs, rotation);
 
         if (children.length > 0) {
             var items = [goBack].concat(children.map(function (pl) {
@@ -166,7 +166,7 @@ function createRouter(settings) {
         });
     });
 
-    function toGoBackItem(backUrl, useThumbs) {
+    function toGoBackItem(backUrl, useThumbs, rotation) {
         return {
             link: backUrl,
             display: "Go Back",
@@ -174,7 +174,7 @@ function createRouter(settings) {
                 ? "/media/playlists/pthumbs/goback_thumb.png"
                 : "/media/playlists/goback.png",
             placeholder: "/images/wheel_loading_0.gif",
-            cssClass: "",
+            cssClass: rotation ? "rotate" + rotation : "",
             favorite: false,
             goBack: true,
         };
@@ -188,7 +188,7 @@ function createRouter(settings) {
                 ? "/media/playlists/pthumbs/" + encodeURIComponent(pl.logo) + "_thumb.png"
                 : "/media/playlists/" + encodeURIComponent(pl.logo) + ".png",
             placeholder: "/images/wheel_loading_" + rotation + ".gif",
-            cssClass: "",
+            cssClass: rotation ? "rotate" + rotation : "",
             favorite: false,
         };
     }

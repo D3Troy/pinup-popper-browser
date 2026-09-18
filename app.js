@@ -6,6 +6,7 @@ var path = require("path");
 var fsPromises = require("node:fs/promises");
 var logger = require("morgan");
 var loadSettings = require("./settings").loadSettings;
+var applyThumbRotationOverride = require("./settings").applyThumbRotationOverride;
 var initSqlJs = require("sql.js");
 var createRouteIndex = require("./routes/index");
 var createRouteGame = require("./routes/game");
@@ -111,12 +112,13 @@ async function start() {
   );
   if (globalRow) {
     globalSettings.defaultMediaDir = globalRow.defaultMediaDir;
-    globalSettings.thumbRotation = globalRow.thumbRotation;
+    globalSettings.pupThumbRotation = globalRow.thumbRotation;
     globalSettings.currentGameRefreshTimer =
       (globalRow.currentGameRefreshInterval || 0) * 1000;
   } else {
     console.error("GlobalSettings not found");
   }
+  applyThumbRotationOverride(settings, globalSettings);
 
   // get emulators
   const emuRows = queryRows(

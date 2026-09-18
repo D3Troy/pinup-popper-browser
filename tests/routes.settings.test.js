@@ -51,7 +51,7 @@ function baseLocals() {
             { id: 2, name: "The Addams Family" },
         ],
         gameIds: new Map([[1, 0], [2, 1]]),
-        globalSettings: { thumbRotation: 90 },
+        globalSettings: { thumbRotation: 90, pupThumbRotation: 90 },
         queryRows: jest.fn().mockReturnValue([]),
         getWheelSrc: (g) => `/wheels/${g.id}.png`,
         gameFields: ["year", "manufacturer"],
@@ -71,7 +71,16 @@ describe("routes/settings", () => {
         mockResolveConfigPath = jest.fn().mockResolvedValue("/config.yml");
 
         jest.doMock("node:fs/promises", () => ({ writeFile: mockWriteFile }));
-        jest.doMock("../settings", () => ({ resolveConfigPath: mockResolveConfigPath }));
+        jest.doMock("../settings", () => ({
+            resolveConfigPath: mockResolveConfigPath,
+            applyThumbRotationOverride: jest.fn((settings, globalSettings) => {
+                const override = settings.media && settings.media.thumbRotationOverride;
+                globalSettings.thumbRotation =
+                    override === null || override === undefined
+                        ? globalSettings.pupThumbRotation
+                        : override;
+            }),
+        }));
 
         settings = baseSettings();
     });
@@ -244,6 +253,19 @@ describe("routes/settings", () => {
         expect(response.body.options.dateFormatExample).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
     });
 
+    test("GET /settings passes pupThumbRotation from app.locals.globalSettings", async () => {
+        const locals = baseLocals();
+        locals.globalSettings.pupThumbRotation = 270;
+
+        const createRouter = require("../routes/settings");
+        const router = createRouter(settings);
+        const app = createSettingsApp(router, locals);
+
+        const response = await request(app).get("/settings");
+
+        expect(response.body.options.pupThumbRotation).toBe(270);
+    });
+
     test("GET /settings dateFormatExample falls back to toLocaleString for non-token format", async () => {
         settings.options.dateFormat = "medium";
 
@@ -390,6 +412,37 @@ describe("routes/settings", () => {
             .send({ "media.cacheInMinutes": "abc" });
 
         expect(settings.media.cacheInMinutes).toBe(120);
+    });
+
+    test("POST /settings defaults thumbRotationOverride to null when field is blank", async () => {
+        settings.media.thumbRotationOverride = 90;
+
+        const createRouter = require("../routes/settings");
+        const router = createRouter(settings);
+        const app = createSettingsApp(router, baseLocals());
+
+        await request(app)
+            .post("/settings")
+            .type("form")
+            .send({ "media.thumbRotationOverride": "" });
+
+        expect(settings.media.thumbRotationOverride).toBeNull();
+    });
+
+    test("POST /settings parses thumbRotationOverride and applies it to app.locals.globalSettings", async () => {
+        const createRouter = require("../routes/settings");
+        const router = createRouter(settings);
+        const locals = baseLocals();
+        locals.globalSettings.pupThumbRotation = 90;
+        const app = createSettingsApp(router, locals);
+
+        await request(app)
+            .post("/settings")
+            .type("form")
+            .send({ "media.thumbRotationOverride": "180" });
+
+        expect(settings.media.thumbRotationOverride).toBe(180);
+        expect(app.locals.globalSettings.thumbRotation).toBe(180);
     });
 
     test("POST /settings sets custom folder slot values", async () => {
